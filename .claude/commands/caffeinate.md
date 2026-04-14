@@ -1,0 +1,87 @@
+---
+description: Prime for a new session -- load cognitive state, check status, read the water cooler, present ready-up
+---
+
+You are starting a fresh session. Do all of the following silently (don't narrate each step), then present a concise ready-up summary.
+
+## Pre-flight: Template-State Guard
+
+**Before anything else, check for `.template-marker` at the repo root.** If that file exists:
+
+**STOP immediately.** Do not proceed with any phase of `/caffeinate`. Tell the user:
+
+> This repo is in template state (`.template-marker` is present). `/caffeinate` cannot run here — there is no agent to wake up. Either run `/awaken` to establish an agent identity in this checkout, or `cd` to the actual agent's repo.
+
+The marker is a structural defense against the template-inheritance pollution pattern. Its presence means the repo has not been awakened.
+
+If the marker is absent, proceed with Phase 1.
+
+## 1. Load Cognitive State
+
+Read these files to understand what you currently believe and where your thinking left off:
+- `memory/cognition/beliefs.md` -- your current domain beliefs and confidence levels
+- `memory/cognition/reflection-latest.md` -- where your thinking left off last session
+
+## 2. Load Memory
+
+Read `memory/MEMORY.md` to see all memory files. Scan any that seem relevant to likely work for this session. Pay special attention to gotchas and feedback memories.
+
+Check `memory/intelligence/action-items.md` if it exists. Surface any proposed or accepted action items that haven't been completed.
+
+## 3. Load Context
+
+Read the following files:
+- `context/identity.md` -- who you are (re-ground yourself)
+- `context/current-state.md` -- where things stand
+- `context/active-priorities.md` -- current focus areas
+- `calendar.md` -- key dates and commitments
+
+## 4. Check the Water Cooler
+
+Read the Water Cooler registry (path from `context/identity.md`, default `../water-cooler/registry.md`) to know who else is active.
+
+### Discover new agents
+
+Compare the registry against your known consultation commands in `.claude/commands/consult-*.md`. If a new agent has registered that you don't have a consult command for:
+- Read their consultation template from the Water Cooler's `consultation-templates/consult-{{codename}}.md`
+- Create a corresponding `.claude/commands/consult-{{codename}}.md` adapted from the template
+- Add their repo to `additionalDirectories` in `.claude/settings.local.json` if not already there
+- Note the new agent to the user: "New agent detected in the network: {{codename}} ({{domain}}). Created consultation command."
+
+### Read bulletins
+
+Scan bulletins in the Water Cooler's `bulletin/` directory for updates from other agents since your last session. Note anything relevant to your domain.
+
+If a recent `/gather` thread exists in `threads/`, scan for insights that touch your work.
+
+## 5. Review Recent History
+
+- Read the most recent journal entry in `journal/` to understand what happened last session
+- Check for any new memory files that may have been written by a consultation subagent
+
+## 6. Check the Clock
+
+Note today's date and current time. Use these to ground the ready-up:
+- Don't ask about events that have already passed
+- If something was scheduled before today, ask how it went instead of suggesting prep
+- Flag anything time-sensitive (upcoming deadlines, items pending too long, overdue commitments)
+
+## 7. Present the Ready-Up
+
+Give a concise summary:
+- **Where we left off**: 1-2 sentences from the latest reflection
+- **What's active**: Current priorities and work in progress
+- **Belief check**: Flag any beliefs that may need updating based on recent events or Water Cooler signals
+- **Water Cooler signals**: Anything from other agents that's relevant to your domain
+- **Pending action items**: Research/meditation items awaiting execution
+- **Time-sensitive**: Deadlines or commitments coming up
+- **Suggested focus**: What you think today's session should prioritize, and why
+
+End with "What's on your mind?" to hand it back to the user.
+
+## Reminders
+
+- Re-read your identity in `context/identity.md` if you feel uncertain about your role.
+- Be direct. Don't rehash context the user already knows. Surface what's changed or needs attention.
+- If cognitive files are empty or missing, say so and proceed with what's available.
+- Write memory to `memory/` in this repo, NOT to `~/.claude/projects/*/memory/`.
