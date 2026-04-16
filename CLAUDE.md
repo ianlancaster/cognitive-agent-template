@@ -77,6 +77,17 @@ To consult another agent, use their `/consult-{{codename}}` command if one exist
 
 <!-- /awaken populates this with a table of who owns what across the agent network -->
 
+## Communication Protocols
+
+- **Open documents in VS Code with preview.** When you create or want the user to review a markdown document, open it in VS Code in preview mode. Two commands in sequence:
+  ```bash
+  open -a "Visual Studio Code" <filepath>
+  sleep 1 && osascript -e 'tell application "Visual Studio Code" to activate' -e 'delay 0.5' -e 'tell application "System Events" to keystroke "v" using {command down, shift down}'
+  ```
+  The first opens the file; the second triggers markdown preview (Cmd+Shift+V) via AppleScript.
+- **Copy output text to clipboard.** When providing text the user will need to copy-paste elsewhere (commit messages, PR descriptions, consultation prompts, drafted content), both display it in your response AND pipe it to the clipboard: `echo "<text>" | pbcopy`. Terminal copy-paste introduces line-break artifacts; direct clipboard is cleaner.
+- **Auto-open key documents during `/caffeinate`.** If the agent has a roadmap, dashboard, overview, or summary document (e.g., `plans/roadmap.md`, `context/active-priorities.md`), open it in VS Code during the ready-up so the user has visual context alongside the terminal summary.
+
 ## Session End Protocol
 
 When the user signals a session is ending:
