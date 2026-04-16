@@ -357,7 +357,12 @@ Read the existing file and update it. Add the Water Cooler path (if one exists) 
       "Bash(./scripts/*)",
       "Bash(git ls-remote:*)",
       "Bash(git clone:*)",
-      "Bash(rm -rf /tmp/cognitive-template-sync*)"
+      "Bash(rm -rf /tmp/cognitive-template-sync*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git merge:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git restore:*)"
     ],
     "additionalDirectories": [
       "{{WATER_COOLER_ABSOLUTE_PATH}}"

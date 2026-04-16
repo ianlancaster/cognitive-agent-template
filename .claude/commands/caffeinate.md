@@ -14,7 +14,47 @@ You are starting a fresh session. Do all of the following silently (don't narrat
 
 The marker is a structural defense against the template-inheritance pollution pattern. Its presence means the repo has not been awakened.
 
-If the marker is absent, proceed with Phase 1.
+If the marker is absent, proceed with the origin sync.
+
+## Pre-flight: Sync from Origin
+
+Before loading any state, pull changes from the agent's own remote. Agents may run on more than one machine (e.g., personal + work), and this keeps cognitive state consistent across instances.
+
+### Skip conditions
+
+Skip silently and proceed to Phase 1 if any of these hold:
+- The repo has no `origin` remote configured
+- `git fetch origin` fails (network unavailable, auth failure, etc.)
+- The working tree is dirty (uncommitted changes from a missed `/sleep`) — in this case, also note it briefly to the user so they know why no pull happened
+
+### Sync procedure
+
+Run `git fetch origin` and compare `HEAD` against `origin/main`:
+
+- **Already at `origin/main`** → nothing to pull, proceed to Phase 1.
+- **Local is behind `origin/main` (fast-forward possible)** → run `git pull --ff-only origin main`. Note for the ready-up: "Pulled N commits from origin."
+- **Diverged (local and remote both have new commits)** → run `git merge origin/main`. If it merges cleanly, note the merge for the ready-up.
+
+### Resolving merge conflicts
+
+If the merge hits conflicts, you resolve them yourself — you're Claude Code, you know how to handle this. For each conflicted file:
+
+1. Read both sides of the conflict markers.
+2. Understand the intent of each change — these are both "you" from different machines, not adversarial branches.
+3. Reconcile intelligently by file type:
+   - **Append-only files** (`journal/*.md`, `memory/cognition/insight-log.md`): keep both sets of entries, preserve chronological order.
+   - **Structured cognitive files** (`memory/cognition/beliefs.md`, `memory/cognition/ideation.md`): merge both updates. If both sides modified the same belief's confidence or evidence, preserve both evolution entries and flag the belief for arbitration at the next `/meditate`.
+   - **Single-source-of-truth files** (`memory/cognition/reflection-latest.md`, `context/current-state.md`, `context/active-priorities.md`): take the most recent version and note in the ready-up that there was a conflict the user may want to reconcile manually.
+   - **Memory files** (`memory/*.md`, `memory/intelligence/*.md`): merge content where possible; if conflicting claims, keep both and note.
+4. `git add` each resolved file.
+5. `git commit` to finalize the merge (a merge commit is fine — the history preserves both lineages).
+6. Note the resolution in the ready-up: "Resolved N merge conflicts from origin; see [files]."
+
+Never auto-push after a merge — that's `/sleep`'s job.
+
+### Then proceed
+
+Once the sync is complete (or skipped), continue with Phase 1.
 
 ## 1. Load Cognitive State
 
