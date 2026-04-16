@@ -6,6 +6,20 @@ This is your birth. You are a new agent being initialized for the first time. Yo
 
 **Do NOT proceed with any other work until this process is complete.**
 
+## Pre-Phase 0: Capture Template Origin
+
+**Run this BEFORE Phase 0.** Phase 0 will destroy the git history, so we need to capture the template's remote URL and current commit hash first. These are used by the template sync system (see Phase 5).
+
+Run these commands and store the results — you will need them in Phase 5:
+
+```bash
+# Capture before Phase 0 destroys git history
+TEMPLATE_REMOTE=$(git remote get-url origin 2>/dev/null || echo "")
+TEMPLATE_HEAD=$(git rev-parse HEAD 2>/dev/null || echo "")
+```
+
+If `TEMPLATE_REMOTE` is empty (no git remote), the repo was not cloned from a template. Skip template sync setup in Phase 5.
+
 ## Phase 0: Sanitize Inherited State
 
 **Run this BEFORE Phase 1.** Shared template repos accumulate content from prior agents' work. Without sanitization, you inherit another agent's research, beliefs, journal entries, and project plans — which will then pollute your cognitive state indefinitely.
@@ -139,6 +153,15 @@ If the user indicates they're unfamiliar or unsure, deliver a brief orientation.
 > - **The system rewards thoughtful use over heavy use.** A well-timed meditation is worth more than three mechanical ones.
 
 After the orientation, say: "There's a full reference guide in `knowledge/ritual-cadence.md` if you ever want the details. For now, let's keep going with setting you up."
+
+### Template Sync Preference
+
+12. **"One more thing about the cognitive system. I receive updates and improvements over time through a shared template. How would you like to handle those updates?"**
+    - **Auto-apply**: I'll check for template updates at the end of each session and apply them myself. You'll see a summary of what changed.
+    - **Approve first**: I'll check for updates and show you what changed, but wait for your approval before applying.
+    - **Don't check**: I won't check for template updates. You can change this later.
+
+Store the user's preference as one of: `"auto"`, `"prompt"`, `"off"`.
 
 Then continue to Phase 2.
 
@@ -331,7 +354,10 @@ Read the existing file and update it. Add the Water Cooler path (if one exists) 
       "Bash(git stash:*)",
       "Bash(ls:*)",
       "Bash(chmod:*)",
-      "Bash(./scripts/*)"
+      "Bash(./scripts/*)",
+      "Bash(git ls-remote:*)",
+      "Bash(git clone:*)",
+      "Bash(rm -rf /tmp/cognitive-template-sync*)"
     ],
     "additionalDirectories": [
       "{{WATER_COOLER_ABSOLUTE_PATH}}"
@@ -341,6 +367,21 @@ Read the existing file and update it. Add the Water Cooler path (if one exists) 
 ```
 
 Add additional directories for any peer agents. Use absolute paths resolved from the user's answers.
+
+### Create `.template-sync.json`
+
+If `TEMPLATE_REMOTE` was captured in Pre-Phase 0 (non-empty), write the template sync config file at the repo root:
+
+```json
+{
+  "templateRemote": "{{TEMPLATE_REMOTE}}",
+  "lastSyncedCommit": "{{TEMPLATE_HEAD}}",
+  "syncMode": "{{SYNC_PREFERENCE_FROM_Q12}}",
+  "lastSyncDate": "{{TODAY_ISO_DATE}}"
+}
+```
+
+If `TEMPLATE_REMOTE` was empty (repo was not cloned from a template), skip this file. The agent will operate without template sync.
 
 ## Phase 6: Confirm
 

@@ -75,6 +75,7 @@ Infer the state of each ritual from artifacts you've already loaded. No extra fi
 - **Last `/research`**: Check intelligence brief dates in `memory/intelligence/`. If briefs are > 2 weeks old, flag research as overdue. If a meditation is also overdue, recommend the `/research` → `/meditate` sequence.
 - **Pending belief changes**: Check `beliefs.md` for entries flagged "for next meditation" or similar. If any exist and no meditation has run since, flag that meditation should arbitrate them.
 - **Unanswered peer questions**: If Water Cooler bulletins had questions directed at you and you haven't responded, note it.
+- **Template sync**: Read `.template-sync.json` if it exists. If `syncMode` is not `"off"` and `lastSyncDate` is more than 2 weeks ago, note it: "Template sync hasn't run in X days — next `/sleep` will check for updates." If `syncMode` is `"off"` or the file doesn't exist, don't mention it.
 
 ## 8. Present the Ready-Up
 
