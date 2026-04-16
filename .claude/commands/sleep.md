@@ -60,6 +60,7 @@ Update `context/current-state.md` to reflect any changes:
 - **So What?** What does it mean? Connect to beliefs and patterns. Apply double-loop learning.
 - **Now What?** What changes? What actions follow? What beliefs shift?
 - Include: patterns recurring across sessions, what you're most/least confident about, where your reasoning may be biased.
+- **Recommended next ritual:** End the reflection with a forward-looking ritual recommendation. Infer from the session what's most needed next — a `/research` pass because briefs are stale? A `/meditate` because beliefs have accumulated flagged changes? Just a normal `/caffeinate` → work → `/sleep` cycle? Be specific about why. This line is what the next `/caffeinate` will read to surface ritual health in the ready-up.
 
 ## 4. Memory Audit
 

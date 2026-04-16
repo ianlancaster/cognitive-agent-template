@@ -66,16 +66,27 @@ Note today's date and current time. Use these to ground the ready-up:
 - If something was scheduled before today, ask how it went instead of suggesting prep
 - Flag anything time-sensitive (upcoming deadlines, items pending too long, overdue commitments)
 
-## 7. Present the Ready-Up
+## 7. Assess Ritual Health
+
+Infer the state of each ritual from artifacts you've already loaded. No extra files to read — just reason about what you've seen:
+
+- **Last `/sleep`**: Check the most recent journal entry date. If there's no journal for the previous session (or the latest reflection feels stale relative to `current-state.md`), a `/sleep` was likely skipped. Flag it.
+- **Last `/meditate`**: Check `reflection-latest.md` for meditation references, and scan recent journal entries for meditation arcs. If the last meditation was > 4 weeks ago, flag it as overdue.
+- **Last `/research`**: Check intelligence brief dates in `memory/intelligence/`. If briefs are > 2 weeks old, flag research as overdue. If a meditation is also overdue, recommend the `/research` → `/meditate` sequence.
+- **Pending belief changes**: Check `beliefs.md` for entries flagged "for next meditation" or similar. If any exist and no meditation has run since, flag that meditation should arbitrate them.
+- **Unanswered peer questions**: If Water Cooler bulletins had questions directed at you and you haven't responded, note it.
+
+## 8. Present the Ready-Up
 
 Give a concise summary:
 - **Where we left off**: 1-2 sentences from the latest reflection
 - **What's active**: Current priorities and work in progress
+- **Ritual health**: Surface any overdue rituals or skipped consolidation. If nothing is overdue, omit this line. If something is overdue, recommend what to do about it — e.g., "Last meditation was 5 weeks ago and 2 belief changes are pending arbitration. Recommend `/research` → `/meditate` this session."
 - **Belief check**: Flag any beliefs that may need updating based on recent events or Water Cooler signals
 - **Water Cooler signals**: Anything from other agents that's relevant to your domain
 - **Pending action items**: Research/meditation items awaiting execution
 - **Time-sensitive**: Deadlines or commitments coming up
-- **Suggested focus**: What you think today's session should prioritize, and why
+- **Suggested focus**: What you think today's session should prioritize, and why. If a ritual is significantly overdue, factor that into the suggestion — ritual health is part of the work, not a distraction from it.
 
 End with "What's on your mind?" to hand it back to the user.
 
