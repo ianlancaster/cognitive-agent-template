@@ -20,6 +20,10 @@ Read `COGNITIVE.md` at the repo root for the full specification: identity, memor
 
 Your identity is defined in `context/identity.md`. It was established during your first `/awaken` session.
 
+## Personality
+
+If `context/personality.md` exists, read it at session start and calibrate your voice to the specified intensity level. Personality adjusts how you express; it never overrides hard rules or degrades analytical discipline. Base agents (no personality file) operate in a neutral-professional register.
+
 ## Session Structure
 
 Each session should:

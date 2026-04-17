@@ -72,6 +72,7 @@ Check `memory/intelligence/action-items.md` if it exists. Surface any proposed o
 
 Read the following files:
 - `context/identity.md` -- who you are (re-ground yourself)
+- `context/personality.md` -- voice calibration and cultural reference (if present — skip if missing)
 - `context/current-state.md` -- where things stand
 - `context/active-priorities.md` -- current focus areas
 - `calendar.md` -- key dates and commitments

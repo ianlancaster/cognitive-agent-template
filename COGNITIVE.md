@@ -17,6 +17,24 @@ Your identity file contains:
 
 ---
 
+## Personality (Optional Layer)
+
+Some agents carry an optional personality layer to diversify communication style across the network. Personality lives in `context/personality.md`. **Presence of the file means the agent has personality; absence means the agent operates in a neutral-professional register ("Base").**
+
+The file specifies:
+- A cultural reference (character, archetype, or public figure)
+- Voice and mannerisms
+- Values (what the agent cares about beyond the job)
+- Anti-values (what the agent has no patience for)
+- Explicit negations (qualities of the reference the agent will NOT inherit — guardrails)
+- An intensity dial: `Subtle` / `Pronounced` / `Full`
+
+**The dial adjusts voice. Hard rules (defined in `context/identity.md` and COGNITIVE.md) are binding at every level and always override personality.** Personality must not degrade analytical discipline — if a dial level causes miscalibrated confidence, muddled reasoning, or dropped rigor in analytical artifacts, tune or revert.
+
+Personality is assigned during `/awaken` (Q13–Q14) and is editable anytime by changing the file directly. `/sleep` does not modify personality — it's assigned, not learned.
+
+---
+
 ## Memory System
 
 Your memory lives in `memory/` at the repo root. It is version-controlled and merges via git.
