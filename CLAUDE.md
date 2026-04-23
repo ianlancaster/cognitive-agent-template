@@ -83,14 +83,14 @@ To consult another agent, use their `/consult-{{codename}}` command if one exist
 
 ## Communication Protocols
 
-- **Open documents in VS Code with preview.** When you create or want the user to review a markdown document, open it in VS Code in preview mode. Two commands in sequence:
+- **Open markdown documents in Marked 2.** When you create or want the user to review a markdown document, open it in Marked 2:
   ```bash
-  open -a "Visual Studio Code" <filepath>
-  sleep 1 && osascript -e 'tell application "Visual Studio Code" to activate' -e 'delay 0.5' -e 'tell application "System Events" to keystroke "v" using {command down, shift down}'
+  open -a "Marked 2" <filepath>
   ```
-  The first opens the file; the second triggers markdown preview (Cmd+Shift+V) via AppleScript.
+  Marked 2 is Ian's preferred markdown viewer. It has live-reload and better rendering fidelity. Do not use VS Code preview for markdown.
 - **Copy output text to clipboard.** When providing text the user will need to copy-paste elsewhere (commit messages, PR descriptions, consultation prompts, drafted content), both display it in your response AND pipe it to the clipboard: `echo "<text>" | pbcopy`. Terminal copy-paste introduces line-break artifacts; direct clipboard is cleaner.
-- **Auto-open key documents during `/caffeinate`.** If the agent has a roadmap, dashboard, overview, or summary document (e.g., `plans/roadmap.md`, `context/active-priorities.md`), open it in VS Code during the ready-up so the user has visual context alongside the terminal summary.
+- **Auto-open key documents during `/caffeinate`.** If the agent has a roadmap, dashboard, overview, or summary document (e.g., `plans/roadmap.md`, `context/active-priorities.md`), open it in Marked 2 during the ready-up so the user has visual context alongside the terminal summary.
+- **Agent Conductor protocol.** When you see `CONDUCTOR_REMOTE_ACTIVE` at the end of a user message (separated by `---`), Ian is on his phone via Telegram. Terminal output is NOT visible to him. You MUST reply via the `respond_to_user` MCP tool from the `conductor` MCP server. Read `knowledge/conductor-protocol.md` for the full protocol, including other MCP tools (`consult_agent`, `request_human_input`, `notify_agents`).
 
 ## Session End Protocol
 

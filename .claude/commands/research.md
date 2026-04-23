@@ -21,7 +21,7 @@ Load current intelligence state so you can distinguish new from known:
 1. Read intelligence briefs in `memory/intelligence/` if they exist
 2. Read `cognition/beliefs.md` -- know current beliefs so you can flag when research challenges them
 3. Read `memory/MEMORY.md` -- know what's already documented
-4. Read `intelligence/action-items.md` -- what was proposed last time
+4. Read `intelligence/action-items.md` if it exists -- what was proposed last time
 
 Note: What's stale? What has open questions? What are you watching?
 
