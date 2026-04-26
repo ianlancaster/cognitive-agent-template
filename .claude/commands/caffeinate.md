@@ -100,6 +100,18 @@ If a recent `/gather` thread exists in `threads/`, scan for insights that touch 
 - Read the most recent journal entry in `journal/` to understand what happened last session
 - Check for any new memory files that may have been written by a consultation subagent
 
+## 5b. Load Recent Conversation History
+
+Load recent session transcripts for conversational continuity. Journals capture WHAT happened; transcripts capture HOW it happened — corrections, decision rhythm, operational details that don't survive compression into journal entries.
+
+1. **Most recent conversation** — find the newest non-empty file in `conversations/` by date. Read it in full. This gives you the full dialogue from the last session including corrections, decisions, and operational rhythm.
+
+2. **2-3 preceding conversations (summaries)** — look for `*_summary.md` sibling files next to the preceding conversation files. If summaries exist, read them (~500-word distillations). If summaries don't exist, dispatch a Sonnet subagent per file to produce one covering: what was worked on, key decisions, corrections from the user, operating rhythm, where things left off. Write the summary as `conversations/{original-filename}_summary.md` for future sessions.
+
+3. **Skip empty or trivially short files** — conversation files under 500 bytes are failed extractions or aborted sessions. Skip them.
+
+The fidelity gradient: full transcript (last session) → summaries (2-3 sessions back) → cognitive files (long-term memory). This ensures conversational context survives across sessions without overwhelming the context window.
+
 ## 6. Check the Clock
 
 Note today's date and current time. Use these to ground the ready-up:
