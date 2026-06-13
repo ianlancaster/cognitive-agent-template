@@ -111,7 +111,7 @@ Ask the user the following questions, one at a time. Wait for each answer before
 
 8. **Discover the Water Cooler.** Check if `../water-cooler/` exists. If it does, read `../water-cooler/registry.md` and present the current roster. If it doesn't exist, ask: "Do you have a Water Cooler directory for multi-agent communication? If so, where is it? If not, I can work standalone." Store the resolved absolute path if one exists.
 
-9. **"Which other agents should I be aware of?"** -- If a Water Cooler exists, present the roster from the registry. Ask which agents this new agent should be able to consult and be consulted by. If no Water Cooler, ask if there are any other agent repos to know about.
+9. **"Which other agents should I be aware of?"** -- If a Water Cooler exists, present the roster from the registry. Ask which agents this new agent should coordinate with. If no Water Cooler, ask if there are any other agent repos to know about.
 
 10. **"What would the other agents want to know about my work? What would I want to know about theirs?"** -- Establish the cross-pollination value proposition.
 
@@ -349,43 +349,9 @@ Just awakened. Establishing domain expertise and initial beliefs.
 (none yet -- first session)
 ```
 
-### Create Consultation Commands
+### Note Network Peers
 
-For each agent the user identified as a peer, create a consultation command at `.claude/commands/consult-{{codename}}.md` following this template:
-
-```markdown
----
-description: Spawn a {{CODENAME}} consultant for {{DOMAIN}} questions
----
-
-You need {{DOMAIN}} context. Spawn a consultant -- a subagent in the {{CODENAME}} repo that loads their cognitive files.
-
-## Spawning the Consultant
-
-Use the Agent tool:
-
-\```
-You are a {{CODENAME}} consultant -- a {{DOMAIN}} advisor spawned from {{REPO_PATH}}.
-
-FIRST, load your cognitive state by reading these files:
-1. `COGNITIVE.md` -- identity and cognitive architecture
-2. `memory/MEMORY.md` -- memory index
-3. `memory/cognition/beliefs.md` (or architecture-beliefs.md or thesis-tracker.md) -- current beliefs
-4. `memory/cognition/reflection-latest.md` -- where thinking left off
-
-THEN, answer this question from {{MY_CODENAME}}:
-
-[YOUR QUESTION]
-
-Ground your answer in your cognitive files and domain knowledge. Be direct.
-\```
-
-## Before Dismissing
-
-Ask the consultant to consolidate insights back to their cognitive files.
-```
-
-Also create the reverse: add a consultation template to the Water Cooler's `consultation-templates/consult-{{MY_CODENAME}}.md` so other agents can consult YOU.
+For each agent the user identified as a peer, note their codename, domain, and repo path. Inter-agent communication happens via the agent conductor MCP tools (`send_to_agent`, `consult_agent`, `broadcast`), not via consult command files. Do NOT create `.claude/commands/consult-*.md` files — those are retired.
 
 ## Phase 5: Configure Settings
 
@@ -460,7 +426,7 @@ If `TEMPLATE_REMOTE` was empty (repo was not cloned from a template), skip this 
 Present a summary:
 - **Identity**: codename, domain, role
 - **Initial beliefs**: list the seeded hypotheses with confidence levels
-- **Network**: which agents are registered, consultation commands created (or "standalone" if no network)
+- **Network**: which agents are registered, conductor protocol configured (or "standalone" if no network)
 - **Water Cooler**: registered and first bulletin posted (or "not configured" if standalone)
 - **Next session**: what you'd recommend working on first
 

@@ -13,15 +13,7 @@ For each bulletin, note:
 - Any insights that might connect to your domain
 - Any questions directed at you or relevant to your expertise
 
-## 2. Discover New Agents
-
-Compare the registry against your known consultation commands in `.claude/commands/consult-*.md`. If a new agent has registered that you don't have a consult command for:
-- Read their consultation template from the Water Cooler's `consultation-templates/consult-{{codename}}.md`
-- Create a corresponding `.claude/commands/consult-{{codename}}.md` adapted from the template
-- Add their repo to `additionalDirectories` in `.claude/settings.local.json` if not already there
-- Note the new agent to the user
-
-## 3. Post Your Update
+## 2. Post Your Update
 
 Write or update `../water-cooler/bulletin/{{your-codename}}.md`:
 
@@ -41,11 +33,11 @@ Things you're curious about that might benefit from cross-domain perspective
 If you noticed something in another agent's bulletin that connects to your work, note it here
 ```
 
-## 4. Report Connections
+## 3. Report Connections
 
 Tell the user about any interesting cross-domain connections you spotted:
 - Insights from other agents that affect your work
 - Questions from others you can answer
 - Patterns that span multiple agents' domains
 
-If a connection is significant enough to act on, suggest a `/gather` session or a direct consultation with the relevant agent.
+If a connection is significant enough to act on, suggest a `/gather` session or use the conductor MCP tools (`send_to_agent`, `consult_agent`) to reach the relevant agent directly.

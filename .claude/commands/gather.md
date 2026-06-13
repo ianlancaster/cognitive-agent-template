@@ -2,7 +2,7 @@
 description: Full multi-agent roundtable -- spawn consultants for all registered agents, facilitate cross-pollination
 ---
 
-This is the heavyweight Water Cooler interaction. You facilitate a multi-agent discussion by spawning a consultant for each registered agent and mediating the conversation.
+This is the heavyweight Water Cooler interaction. You facilitate a multi-agent discussion by spawning a subagent for each registered agent and mediating the conversation. (Inter-agent communication for day-to-day work uses the conductor MCP tools; `/gather` uses direct subagent spawning because it needs multi-party dialogue in a single context.)
 
 **When to use:** When cross-pollination is needed. When multiple agents' domains intersect on a problem. When the user wants the network to think together. Roughly monthly or as needed.
 
