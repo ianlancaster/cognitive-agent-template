@@ -2,6 +2,8 @@
 
 *Purpose: Reference guide for when and how to use the ritual commands. This document helps both the agent and the user understand the cognitive system and get real value from it.*
 
+Command notation in this guide uses Claude Code's `/ritual-name` spelling. In Codex, invoke the same canonical ritual as `$ritual-name`. The behavior and persisted files are shared; see `knowledge/runtime-interop.md`.
+
 ---
 
 ## TL;DR

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Caffeinate"
+  short_description: "Load cognitive state at session start"
+  default_prompt: "Use $caffeinate to load persisted cognitive state and begin a session."

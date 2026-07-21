@@ -2,15 +2,15 @@
 
 **This repository is in template state.** It is a skeleton for new agents, not an active agent itself.
 
-The presence of this file is proof that no `/awaken` has run. `/awaken` Phase 0 deletes this marker as part of the sanitization that establishes an agent's identity.
+The presence of this file is proof that no awaken ritual has run. The awaken ritual deletes this marker as part of the sanitization that establishes an agent's identity.
 
 ## If you are an operator setting up a new agent
 
 1. Clone this template to a new directory (e.g., `../agent-foo`)
 2. Navigate to that directory
-3. Run `/awaken` in Claude Code
+3. Run `/awaken` in Claude Code or `$awaken` in Codex
 
-`/awaken` Phase 0 will:
+Awaken Phase 0 will:
 - Verify the safety check (no existing agent in this repo)
 - Clear any accumulated template content (memory files, cognitive files, intelligence briefs, etc.)
 - Delete this marker file
@@ -18,20 +18,20 @@ The presence of this file is proof that no `/awaken` has run. `/awaken` Phase 0 
 
 Then Phase 1+ will establish the agent's identity.
 
-## If you are an agent seeing this file on `/caffeinate`
+## If you are an agent seeing this file during caffeinate
 
-**STOP.** You have not been awakened. `/caffeinate` should refuse to run when this marker is present. If you're reading this inside an agent's working cognitive flow, something is wrong:
+**STOP.** You have not been awakened. `/caffeinate` in Claude Code and `$caffeinate` in Codex should refuse to run when this marker is present. If you're reading this inside an agent's working cognitive flow, something is wrong:
 
-- Either this template repo was accidentally used as an agent's working directory (no `/awaken` was run)
-- Or `/awaken` Phase 0 failed to delete this marker
-- Or a previous agent's state has been restored without re-running `/awaken`
+- Either this template repo was accidentally used as an agent's working directory (awaken was never run)
+- Or awaken Phase 0 failed to delete this marker
+- Or a previous agent's state has been restored without re-running awaken
 
-Tell the user what you found and ask them to either (a) move this checkout aside and clone from their agent's actual repo, or (b) run `/awaken` to establish a new agent identity in this checkout.
+Tell the user what you found and ask them to either (a) move this checkout aside and clone from their agent's actual repo, or (b) run `/awaken` in Claude Code or `$awaken` in Codex to establish a new agent identity in this checkout.
 
 ## Why this file exists
 
 Earlier (April 2026): the `cognitive-agent-template.git` remote accumulated Ford's active working state because Ford and Wolf both pushed to it as their origin. Wolf discovered Ford-origin files in their repo via `/sleep` memory audit — inherited through template cloning plus incomplete `/awaken` sanitization.
 
-This marker is the structural defense against that failure mode. Its presence is unmissable; `/awaken` Phase 0 and `/caffeinate` both check for it.
+This marker is the structural defense against that failure mode. Its presence is unmissable; awaken Phase 0 and both runtimes' caffeinate ritual check for it.
 
-**Do not manually delete this file.** It is deleted exclusively by `/awaken` Phase 0 as part of the documented sanitization procedure.
+**Do not manually delete this file.** It is deleted exclusively by awaken Phase 0 as part of the documented sanitization procedure.

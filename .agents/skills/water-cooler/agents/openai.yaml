@@ -1,0 +1,4 @@
+interface:
+  display_name: "Water Cooler"
+  short_description: "Read and post peer-agent bulletins"
+  default_prompt: "Use $water-cooler to exchange updates with registered peer agents."

@@ -8,17 +8,17 @@ This is your birth. You are a new agent being initialized for the first time. Yo
 
 ## Pre-Phase 0: Capture Template Origin
 
-**Run this BEFORE Phase 0.** Phase 0 will destroy the git history, so we need to capture the template's remote URL and current commit hash first. These are used by the template sync system (see Phase 5).
+**Run this BEFORE Phase 0.** Capture the template's remote URL and current commit hash before any remote is repointed for the new agent. These are used by the template sync system (see Phase 5).
 
 Run these commands and store the results — you will need them in Phase 5:
 
 ```bash
-# Capture before Phase 0 destroys git history
-TEMPLATE_REMOTE=$(git remote get-url origin 2>/dev/null || echo "")
+# Capture before the agent's origin is changed
+TEMPLATE_REMOTE=$(git remote get-url template 2>/dev/null || git remote get-url origin 2>/dev/null || echo "")
 TEMPLATE_HEAD=$(git rev-parse HEAD 2>/dev/null || echo "")
 ```
 
-If `TEMPLATE_REMOTE` is empty (no git remote), the repo was not cloned from a template. Skip template sync setup in Phase 5.
+If `TEMPLATE_REMOTE` is empty (no git remote), the repo was not cloned from a template. Skip template sync setup in Phase 5. A remote named `template` is preferred so the agent can use its own `origin` without losing the upstream template reference.
 
 ## Phase 0: Sanitize Inherited State
 
@@ -51,8 +51,17 @@ find memory/intelligence -maxdepth 1 -type f -name "*.md" ! -name "README.md" -d
 # Reset the memory index (Phase 3 recreates)
 rm -f memory/MEMORY.md
 
-# Remove inherited plans, knowledge, journal, conversations
-rm -rf plans/* knowledge/* journal/* conversations/* 2>/dev/null
+# Remove inherited plans, journal, and conversations
+rm -rf plans/* journal/* conversations/* 2>/dev/null
+
+# Remove agent-specific inherited knowledge while preserving template infrastructure
+find knowledge -mindepth 1 -maxdepth 1 \
+  ! -name ".gitkeep" \
+  ! -name "ritual-cadence.md" \
+  ! -name "conductor-protocol.md" \
+  ! -name "conductor-scheduling.md" \
+  ! -name "runtime-interop.md" \
+  -exec rm -rf {} +
 
 # Reset calendar and context files (Phase 2 populates identity; current-state/active-priorities get seeded)
 rm -f calendar.md context/current-state.md context/active-priorities.md
@@ -66,9 +75,11 @@ rm -f .template-marker
 ### Files to explicitly preserve
 
 - `.claude/` directory (commands + settings — your ritual infrastructure)
+- `.agents/`, `.codex/`, and `AGENTS.md` (Codex ritual adapters, configuration, and bootstrap)
 - `COGNITIVE.md` (cognitive architecture specification)
 - `CLAUDE.md` (Phase 2 will overwrite with your identity — leaving it in place is fine)
 - `scripts/` (infrastructure)
+- Template knowledge files: `ritual-cadence.md`, `conductor-protocol.md`, `conductor-scheduling.md` if present, and `runtime-interop.md`
 - `LICENSE`, `README.md`, `.gitignore`
 - `memory/intelligence/README.md` (template stub for the intelligence system)
 
@@ -215,7 +226,7 @@ Replace all `{{PLACEHOLDER}}` values in CLAUDE.md with the actual content:
 - `{{OPERATING_PHILOSOPHY}}` -- domain-appropriate guidance synthesized from the user's answers
 - `{{DOMAIN_BOUNDARIES}}` -- table of domain ownership across the agent network (or "Solo agent -- no network peers yet" if standalone)
 
-**Remove the onboarding comment block** at the top of CLAUDE.md (the HTML comment that says "ONBOARDING: This file contains placeholders..."). The agent is now awake and those instructions are no longer needed.
+**Remove the first-run gate comment block** at the top of CLAUDE.md. The agent is now awake and those instructions are no longer needed. Do not rewrite `AGENTS.md`; it is a stable Codex bridge that reads this same canonical file.
 
 ### `context/personality.md` (conditional)
 
@@ -315,6 +326,14 @@ Write the first reflection:
 - **So What?** {{What does this domain mean in the broader context?}}
 - **Now What?** {{What should the first real working session focus on?}}
 
+### Memory Index (`memory/MEMORY.md`)
+
+Recreate the memory index with empty User, Feedback, Domain, Project, and Reference sections plus links to all four freshly seeded cognition files. Keep the index under 200 lines.
+
+### Intelligence Action Items (`memory/intelligence/action-items.md`)
+
+Recreate the empty action-items tracker using the format documented in `memory/intelligence/README.md`.
+
 ## Phase 4: Set Up Inter-Agent Communication
 
 *Skip this phase entirely if no Water Cooler exists and no peer agents were identified.*
@@ -362,7 +381,7 @@ You need {{DOMAIN}} context. Spawn a consultant -- a subagent in the {{CODENAME}
 
 ## Spawning the Consultant
 
-Use the Agent tool:
+Use the runtime's subagent mechanism. In Claude Code, use the Agent tool. In Codex, use its subagent tools as described in `knowledge/runtime-interop.md`:
 
 \```
 You are a {{CODENAME}} consultant -- a {{DOMAIN}} advisor spawned from {{REPO_PATH}}.
@@ -403,6 +422,12 @@ Read the existing file and update it. Add the Water Cooler path (if one exists) 
       "Write(CLAUDE.md)",
       "Edit(COGNITIVE.md)",
       "Write(COGNITIVE.md)",
+      "Edit(AGENTS.md)",
+      "Write(AGENTS.md)",
+      "Edit(.agents/**)",
+      "Write(.agents/**)",
+      "Edit(.codex/**)",
+      "Write(.codex/**)",
       "Edit(context/**)",
       "Write(context/**)",
       "Edit(journal/**)",
@@ -439,6 +464,8 @@ Read the existing file and update it. Add the Water Cooler path (if one exists) 
 ```
 
 Add additional directories for any peer agents. Use absolute paths resolved from the user's answers.
+
+These settings preserve Claude Code behavior. When running in Codex, also tell the user which Water Cooler and peer paths should be passed with `codex --add-dir` on future launches; see `knowledge/runtime-interop.md`. Do not create a second copy of agent identity or cognitive state for Codex.
 
 ### Create `.template-sync.json`
 

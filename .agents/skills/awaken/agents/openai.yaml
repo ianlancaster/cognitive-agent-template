@@ -1,0 +1,4 @@
+interface:
+  display_name: "Awaken"
+  short_description: "Establish a new cognitive agent identity"
+  default_prompt: "Use $awaken to establish this cognitive agent identity for the first time."

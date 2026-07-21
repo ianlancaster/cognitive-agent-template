@@ -43,6 +43,9 @@ For each changed file in the diff, read the template's new version from the temp
 
 **Files in scope for sync:**
 - `.claude/commands/*.md` — ritual commands (infrastructure)
+- `.agents/skills/**` — thin Codex ritual adapters
+- `.codex/config.toml` — Codex project configuration
+- `AGENTS.md` — Codex bootstrap bridge
 - `COGNITIVE.md` — cognitive architecture spec
 - `scripts/*` — infrastructure scripts
 - `knowledge/*.md` — knowledge docs (ritual-cadence, conductor-protocol, etc.)
@@ -54,7 +57,7 @@ For each changed file in the diff, read the template's new version from the temp
 - `calendar.md`, `.template-marker`, `.template-sync.json`
 - `.gitignore`, `LICENSE`, `README.md`
 
-**For pure infrastructure files** (commands, COGNITIVE.md, scripts, knowledge docs): Apply the template's changes. If you have agent-specific additions to the same file (e.g., an extra phase in caffeinate), preserve your additions and integrate the template's changes around them.
+**For pure infrastructure files** (commands, Codex skill adapters and config, AGENTS.md, COGNITIVE.md, scripts, knowledge docs): Apply the template's changes. If you have agent-specific additions to the same file (e.g., an extra phase in caffeinate), preserve your additions and integrate the template's changes around them.
 
 **For CLAUDE.md** (hybrid file): The template provides structural sections (Memory System Override, Cognitive Architecture, Session Structure, What You Know, Proactive Behaviors, Communication Protocols, Inter-Agent Communication, Session End Protocol). Agent-specific sections (title, identity paragraph, Operating Philosophy content, Domain Boundaries table) must never be overwritten. Apply template changes only to structural sections.
 

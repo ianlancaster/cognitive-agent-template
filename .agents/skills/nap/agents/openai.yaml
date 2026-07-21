@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nap"
+  short_description: "Create a mid-session cognitive save point"
+  default_prompt: "Use $nap to capture insights and save progress after a major deliverable."

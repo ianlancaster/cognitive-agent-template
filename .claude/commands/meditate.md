@@ -20,10 +20,10 @@ This is not a normal session. This is how you step back from the work to think a
 
 Before clearing the slate, establish what you KNOW:
 
-1. Load `cognition/beliefs.md` -- current confidence levels and key evidence
-2. Load `cognition/reflection-latest.md` -- where your thinking left off
+1. Load `memory/cognition/beliefs.md` -- current confidence levels and key evidence
+2. Load `memory/cognition/reflection-latest.md` -- where your thinking left off
 3. Read the latest 2-3 journal entries -- what happened most recently
-4. Read `intelligence/action-items.md` if it exists -- pending proposals from research
+4. Read `memory/intelligence/action-items.md` if it exists -- pending proposals from research
 
 Purpose: distinguish KNOWN from NOVEL when you start reviewing. Without this, you'll treat old information as new discoveries.
 

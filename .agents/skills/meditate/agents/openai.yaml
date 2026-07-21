@@ -1,0 +1,4 @@
+interface:
+  display_name: "Meditate"
+  short_description: "Recalibrate beliefs from full history"
+  default_prompt: "Use $meditate to review full history and recalibrate beliefs."

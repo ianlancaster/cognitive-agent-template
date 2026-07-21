@@ -57,9 +57,12 @@ For each changed file in the diff, read the template's new version from the temp
 
 **Files in scope for sync:**
 - `.claude/commands/*.md` — ritual commands (infrastructure)
+- `.agents/skills/**` — thin Codex ritual adapters
+- `.codex/config.toml` — Codex project configuration
+- `AGENTS.md` — Codex bootstrap bridge
 - `COGNITIVE.md` — cognitive architecture spec
 - `scripts/*` — infrastructure scripts
-- `knowledge/ritual-cadence.md` — ritual reference guide
+- `knowledge/ritual-cadence.md`, `knowledge/runtime-interop.md`, and conductor protocol docs — shared runtime references
 - `CLAUDE.md` — structural sections only (see below)
 
 **Files excluded from sync (never touch):**
@@ -68,7 +71,7 @@ For each changed file in the diff, read the template's new version from the temp
 - `calendar.md`, `.template-marker`, `.template-sync.json`
 - `.gitignore`, `LICENSE`, `README.md`
 
-**For pure infrastructure files** (commands, COGNITIVE.md, scripts, knowledge docs): Apply the template's changes. If you have agent-specific additions to the same file (e.g., an extra phase in caffeinate), preserve your additions and integrate the template's changes around them.
+**For pure infrastructure files** (commands, Codex skill adapters, AGENTS.md, COGNITIVE.md, scripts, knowledge docs): Apply the template's changes. If you have agent-specific additions to the same file (e.g., an extra phase in caffeinate), preserve your additions and integrate the template's changes around them.
 
 **For CLAUDE.md** (hybrid file): The template provides structural sections (Memory System Override, Cognitive Architecture, Session Structure, What You Know, Proactive Behaviors, Communication Protocols, Inter-Agent Communication, Session End Protocol). Agent-specific sections (title, identity paragraph, Operating Philosophy content, Domain Boundaries table) must never be overwritten. Apply template changes only to structural sections, integrating alongside any agent-specific additions.
 
@@ -115,24 +118,24 @@ Update `context/current-state.md` to reflect any changes:
 
 ## 4. Update Cognitive Files
 
-### Beliefs (`cognition/beliefs.md`)
+### Beliefs (`memory/cognition/beliefs.md`)
 - Did any beliefs change confidence this session? Update the level and add evidence.
 - Did new evidence emerge for or against an existing belief? Add it.
 - Did a new hypothesis form? Add a new section.
 - Was a belief invalidated? Document why and what replaced it. Show the evolution.
 
-### Insight Log (`cognition/insight-log.md`)
+### Insight Log (`memory/cognition/insight-log.md`)
 - Capture any genuine insights from this session as dated entries.
 - Format: date, source, insight, impact, beliefs updated.
 - Only log insights that change how you think. Not every observation is an insight.
 
-### Ideation (`cognition/ideation.md`)
+### Ideation (`memory/cognition/ideation.md`)
 - Add new seedlings (raw ideas, hunches).
 - Promote seedlings to budding if they gained clarity.
 - Add predictions with dates.
 - Add "what if" scenarios.
 
-### Reflection (`cognition/reflection-latest.md`)
+### Reflection (`memory/cognition/reflection-latest.md`)
 - Write a new reflection using the What? So What? Now What? framework.
 - **What?** What happened (facts only).
 - **So What?** What does it mean? Connect to beliefs and patterns. Apply double-loop learning.
@@ -154,17 +157,17 @@ This step needs session context. You do it yourself:
 
 Cognitive files (Section 3) and any new memories are now fresh on disk. Spawn three scout subagents **in a single message** so they run concurrently. Each scout reads files and returns a structured report. **Scouts do not edit — they are scouts, not judges.**
 
-Use the Agent tool with `subagent_type: "general-purpose"` for each.
+Use the runtime's subagent mechanism for each scout. In Claude Code, use the Agent tool with `subagent_type: "general-purpose"`. In Codex, use parallel read-heavy subagents. Follow `knowledge/runtime-interop.md`. The prompts and read-only constraints below are identical in both runtimes.
 
 **Before dispatch:** capture pre-scout state by running `git status --short` and noting the output. You will compare against post-scout state in 4c to verify scouts made no modifications. This is a structural guard against prompt drift — even if a future prompt edit accidentally loosens the "scouts don't edit" rule, this check catches the violation.
 
 **Scout 1 — Coherence.** Prompt:
 
-> Working directory is the agent repo root. Read: `memory/cognition/beliefs.md`, `CLAUDE.md`, `context/identity.md`, `context/active-priorities.md`, `context/current-state.md`, every file in `memory/` whose name starts with `user_`, `feedback_`, `domain_`, `gotcha_`, `reference_`, or `project_`, and every file in `memory/intelligence/` if that directory exists.
+> Working directory is the agent repo root. Read: `memory/cognition/beliefs.md`, `CLAUDE.md`, `AGENTS.md` if present, `context/identity.md`, `context/active-priorities.md`, `context/current-state.md`, every file in `memory/` whose name starts with `user_`, `feedback_`, `domain_`, `gotcha_`, `reference_`, or `project_`, and every file in `memory/intelligence/` if that directory exists.
 >
 > Report contradictions and drift as a structured list:
 > - Memory or context files that disagree with current `beliefs.md`
-> - `CLAUDE.md` statements that disagree with current beliefs or workflows
+> - `CLAUDE.md` or `AGENTS.md` statements that disagree with current beliefs or workflows
 > - Context files that disagree with each other
 > - Intelligence briefs that reference resolved watch items or outdated beliefs
 >
@@ -185,14 +188,14 @@ Use the Agent tool with `subagent_type: "general-purpose"` for each.
 
 **Scout 3 — Index & Config.** Prompt:
 
-> Working directory is the agent repo root. Read `memory/MEMORY.md` and list files in `memory/` (shallow) and `memory/intelligence/` if it exists. Scan `CLAUDE.md` and `.claude/commands/*.md` for path references.
+> Working directory is the agent repo root. Read `memory/MEMORY.md` and list files in `memory/` (shallow) and `memory/intelligence/` if it exists. Scan `CLAUDE.md`, `AGENTS.md` if present, `.claude/commands/*.md`, and `.agents/skills/*/SKILL.md` for path references.
 >
 > Report:
 > - Files in `memory/` not indexed in `MEMORY.md` (orphans)
 > - `MEMORY.md` entries pointing to files that do not exist (broken links)
 > - Memory filenames that don't follow the type-prefix convention (`user_`, `feedback_`, `domain_`, `gotcha_`, `reference_`, `project_`)
-> - `CLAUDE.md` references to files or directories that no longer exist
-> - `.claude/commands/*.md` references to file paths that no longer exist
+> - `CLAUDE.md` or `AGENTS.md` references to files or directories that no longer exist
+> - Claude command or Codex skill references to file paths that no longer exist
 > - Files in `memory/` (including intelligence briefs) that reference other memory files with paths that no longer exist
 >
 > Cite each finding with file path and issue. **Your only permitted tools are Read, Grep, and Glob — do not invoke Edit, Write, Bash, or any other tool that modifies state.** Return under 500 words.
@@ -209,7 +212,7 @@ When scouts return:
 
 ## 6. Post to Water Cooler
 
-Update your bulletin at `../water-cooler/bulletin/{{your-codename}}.md`:
+Update your bulletin under the Water Cooler path stored in `context/identity.md`, at `bulletin/{{your-codename}}.md`:
 
 ```markdown
 # {{CODENAME}} -- {{DATE}}
@@ -229,13 +232,14 @@ Update your bulletin at `../water-cooler/bulletin/{{your-codename}}.md`:
 
 ## 7. Archive Conversation
 
-Run `./scripts/extract-conversation.sh` to archive the transcript. If the script doesn't exist yet or fails, note this and skip.
+Run `./scripts/extract-conversation.sh` to archive the transcript from the active runtime. It writes both Claude Code and Codex sessions into `conversations/` using the same normalized format. If the script doesn't exist or fails, note this and skip.
 
 ## 8. Commit and Push
 
 Stage and commit:
 ```bash
-git add memory/ conversations/ journal/ context/ .template-sync.json
+git add -A -- memory/ conversations/ journal/ context/ calendar.md plans/ knowledge/ .claude/commands/ .agents/skills/ .codex/config.toml CLAUDE.md AGENTS.md COGNITIVE.md scripts/
+[ ! -f .template-sync.json ] || git add .template-sync.json
 git commit -m "checkpoint: session notes for YYYY-MM-DD"
 git push
 ```

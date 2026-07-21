@@ -1,18 +1,18 @@
 # Cognitive Agent Template
 
-A template for creating persistent AI agent personas in [Claude Code](https://docs.anthropic.com/en/docs/claude-code) with built-in cognitive architecture: evolving beliefs, structured reflection, environmental scanning, and multi-agent communication.
+A template for creating persistent AI agent personas that can move between [Claude Code](https://code.claude.com/docs) and [Codex](https://developers.openai.com/codex/) with built-in cognitive architecture: evolving beliefs, structured reflection, environmental scanning, and multi-agent communication.
 
 ## What This Is
 
-Most AI assistants start fresh every conversation. This template gives Claude Code agents **persistent consciousness** -- they learn, grow, and remember across sessions through a structured cognitive system.
+Most AI assistants start fresh every conversation. This template gives Claude Code and Codex agents **persistent consciousness** -- they learn, grow, and remember across sessions through one shared, file-based cognitive system.
 
 Every agent spawned from this template gets:
 
 - **Persistent beliefs** with confidence levels, evidence tracking, and visible evolution
 - **Structured reflection** using the What? / So What? / Now What? framework
 - **Environmental scanning** that distills external research into living intelligence briefs
-- **Session rituals** (`/caffeinate` to start, `/sleep` to consolidate, `/meditate` to recalibrate)
-- **First-run onboarding** (`/awaken`) that asks questions and builds the agent's identity
+- **Session rituals** (`/caffeinate` in Claude Code or `$caffeinate` in Codex, with matching sleep and meditation rituals)
+- **First-run onboarding** (`/awaken` or `$awaken`) that asks questions and builds the agent's identity
 - **Multi-agent communication** via a shared Water Cooler protocol
 - **Synaptic pruning** that detects contradictions and optimizes cognitive files each session
 - **Conversation archiving** for full session history
@@ -24,13 +24,27 @@ Every agent spawned from this template gets:
 ```bash
 git clone https://github.com/your-org/cognitive-agent-template.git my-agent-name
 cd my-agent-name
-rm -rf .git && git init
+git remote rename origin template
+# Optional: connect this agent to its own repository
+git remote add origin <your-agent-repository-url>
 ```
 
-### 2. Open in Claude Code and run `/awaken`
+Renaming the template remote preserves the upstream commit and URL used by template sync while leaving `origin` available for the new agent's own repository.
+
+### 2. Open in either runtime and awaken
+
+Claude Code:
 
 ```bash
 claude
+# Then run: /awaken
+```
+
+Codex:
+
+```bash
+codex
+# Then invoke: $awaken
 ```
 
 The agent will ask you a series of questions to establish its identity:
@@ -42,27 +56,28 @@ The agent will ask you a series of questions to establish its identity:
 - What tools and resources should it know about?
 - Are there any hard rules?
 
-Based on your answers, `/awaken` will:
+Based on your answers, the awaken ritual will:
 - Write `context/identity.md` with the agent's synthesized identity
-- Customize `CLAUDE.md` with domain-specific instructions
+- Customize the canonical `CLAUDE.md` with domain-specific instructions; Codex reads it through `AGENTS.md`
 - Seed 3-7 initial beliefs at conservative confidence levels
 - Write the first reflection and insight log entry
 - Register in the Water Cooler (if one exists)
-- Set up consultation commands for peer agents
+- Set up peer consultation access for the active runtime
 - Configure file permissions for autonomous cognitive updates
 - **Clean up onboarding placeholders** so the repo is ready for real work
 
 ### 3. Start working
 
-Use `/caffeinate` at the start of each session and `/sleep` at the end. The agent learns and grows from there.
+In Claude Code, use `/caffeinate` at the start of each session and `/sleep` at the end. In Codex, use `$caffeinate` and `$sleep`. Both runtimes update the same files, so you can switch between them from one session to the next.
 
 ## Architecture
 
 ```
 my-agent/
+  AGENTS.md               # Thin Codex bridge to the canonical instructions
   CLAUDE.md               # Domain-specific operational instructions
   COGNITIVE.md             # Consciousness architecture (identity, memory, beliefs, meta-cognition)
-  memory/                  # Persistent memory (outside .claude/ for permission-free writes)
+  memory/                  # Shared persistent memory for both runtimes
     MEMORY.md              # Index of all memory files
     cognition/             # Active thinking (not just storage)
       beliefs.md           # Hypotheses with confidence levels and evidence
@@ -80,23 +95,28 @@ my-agent/
   .claude/
     commands/              # Session rituals and inter-agent commands
     settings.local.json    # Permissions (auto-configured by /awaken)
+  .agents/
+    skills/                # Thin Codex adapters for the canonical rituals
+  .codex/
+    config.toml            # Keeps Codex native memory disabled for this repo
   scripts/
-    extract-conversation.sh  # Archive Claude Code transcripts
+    extract-conversation.sh  # Archive Claude Code and Codex transcripts
 ```
 
 ### Why `memory/` is at the repo root
 
-Claude Code hardcodes `.claude/` as a protected directory and prompts for permission on every write -- even with explicit allow rules in settings. By placing memory outside `.claude/`, agents can freely update their cognitive files during sessions without interrupting for approval. This is critical for autonomous operation during `/sleep` and `/meditate`.
+Memory is runtime-neutral state, not runtime configuration. Keeping it at the repository root lets Claude Code and Codex read and update exactly the same beliefs, reflections, and durable memories. Neither host's native memory store is authoritative for this agent.
 
 ## Session Rituals
 
-| Command | Purpose | When |
-|---------|---------|------|
-| `/awaken` | First-run identity establishment | Once, when the agent is created |
-| `/caffeinate` | Load cognitive state, check status, present ready-up | Start of every session |
-| `/sleep` | Consolidate insights, update beliefs, prune contradictions, archive | End of every session |
-| `/meditate` | Deep recalibration from full history | Monthly or after major shifts |
-| `/research` | Environmental scanning for the agent's domain | Monthly or before meditations |
+| Claude Code | Codex | Purpose | When |
+|---|---|---|---|
+| `/awaken` | `$awaken` | First-run identity establishment | Once, when the agent is created |
+| `/caffeinate` | `$caffeinate` | Load cognitive state, check status, present ready-up | Start of every session |
+| `/nap` | `$nap` | Mid-session mini-consolidation | After a major deliverable |
+| `/sleep` | `$sleep` | Consolidate insights, update beliefs, prune contradictions, archive | End of every session |
+| `/meditate` | `$meditate` | Deep recalibration from full history | Monthly or after major shifts |
+| `/research` | `$research` | Environmental scanning for the agent's domain | Biweekly or before meditations |
 
 ### The Cognitive Cycle
 
@@ -143,9 +163,9 @@ Each agent registers during `/awaken` and posts updates during `/sleep`. During 
 
 ### Direct Consultation (Synchronous)
 
-Any agent can consult any other by spawning a subagent in the target's repo. The subagent loads the target's cognitive files (beliefs, reflection, memory), answers questions, and consolidates new insights back before dying. The cognitive files are the "soul" that transfers between instances.
+Any agent can consult any other by spawning a subagent in the target's repo. Claude Code uses its Agent tool; Codex uses its subagent tools. The consultant loads the target's cognitive files (beliefs, reflection, memory), answers questions, and consolidates new insights back before dying. The cognitive files are the "soul" that transfers between instances.
 
-Consultation commands are auto-created during `/awaken` and `/caffeinate` when new agents appear in the registry.
+Claude Code consultation commands are auto-created during `/awaken` and `/caffeinate` when new agents appear in the registry. Codex consults the same registered peers directly through its subagent mechanism.
 
 ## Synaptic Pruning
 
@@ -162,7 +182,8 @@ This keeps the cognitive system lean and coherent over time.
 The template is domain-agnostic. `/awaken` handles all customization through its question protocol. After awakening, you can further customize:
 
 - **`knowledge/`** -- add domain-specific reference material, frameworks, or research
-- **`.claude/commands/`** -- add domain-specific commands beyond the standard rituals
+- **`.claude/commands/`** -- canonical ritual bodies and Claude Code commands
+- **`.agents/skills/`** -- thin Codex adapters; keep substantive ritual logic in `.claude/commands/`
 - **`memory/intelligence/`** -- create intelligence briefs for areas you want to scan regularly
 - **`CLAUDE.md`** -- refine the operational instructions as the agent's role becomes clearer
 
@@ -170,7 +191,8 @@ The template is domain-agnostic. `/awaken` handles all customization through its
 
 - **Beliefs are hypotheses, not facts.** Every belief has a confidence level, evidence, and a "what would change my mind" test. They evolve visibly.
 - **Reflection is thinking, not documentation.** The `/sleep` reflection is the act of processing the session, not a summary for someone else.
-- **Memory lives outside `.claude/`.** This is a deliberate architectural choice for permission-free writes, not an accident.
+- **Memory is runtime-neutral.** It lives outside both hosts' configuration and native-memory directories so switching runtimes never forks the agent's state.
+- **Rituals have one source.** Claude Code executes the canonical `.claude/commands/` files directly; Codex skills point to those same files.
 - **The agent starts blank.** No pre-loaded personality, domain knowledge, or opinions. `/awaken` builds everything from the conversation with the user.
 - **Cognitive files are the soul.** Agents are ephemeral. The files are what persist. The quality of the cognitive system depends on disciplined use of `/sleep`.
 

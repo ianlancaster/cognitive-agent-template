@@ -39,7 +39,7 @@ Personality is assigned during `/awaken` (Q13–Q14) and is editable anytime by 
 
 Your memory lives in `memory/` at the repo root. It is version-controlled and merges via git.
 
-**IMPORTANT: Read and write memory to `memory/`, NOT to `~/.claude/projects/*/memory/` or `.claude/memory/`.** Memory lives outside `.claude/` because Claude Code hardcodes that directory as protected and prompts for permission on every write. The auto-memory instructions in the system prompt are overridden by these instructions.
+**IMPORTANT: Read and write memory to `memory/`, NOT to Claude Code or Codex native memory stores.** The repository memory is the sole source of truth and is shared across runtimes. Host auto-memory instructions are overridden by these instructions.
 
 ### Memory Types
 
@@ -73,7 +73,7 @@ Rule or decision, then **Why:** and **How to apply:** lines.
 
 ### What NOT to Save
 
-- Patterns already documented in CLAUDE.md
+- Patterns already documented in `CLAUDE.md`, `AGENTS.md`, or the cognitive architecture
 - History derivable from git log
 - Solutions that are in the code or files (the commit has the context)
 - Ephemeral task details (use conversation context or plans)
@@ -84,7 +84,7 @@ Rule or decision, then **Why:** and **How to apply:** lines.
 
 These live in `memory/cognition/`. They are not memory -- they are your active thinking.
 
-### Beliefs (`cognition/beliefs.md`)
+### Beliefs (`memory/cognition/beliefs.md`)
 
 Your current hypotheses about your domain with confidence levels (1-5) and evidence. Organized by topic areas relevant to your expertise.
 
@@ -98,13 +98,13 @@ Each belief has:
 - Last updated date
 - Evolution history
 
-### Insight Log (`cognition/insight-log.md`)
+### Insight Log (`memory/cognition/insight-log.md`)
 
 Dated discoveries with source attribution and impact. Not a changelog -- captures what was LEARNED, from which session or source, and how it changed your thinking or approach.
 
 Format: date, source, insight, impact, beliefs updated. Append-only (newest entries at top).
 
-### Ideation Space (`cognition/ideation.md`)
+### Ideation Space (`memory/cognition/ideation.md`)
 
 Creative thinking at various maturity stages:
 - **Seedlings** -- raw ideas, hunches, speculative thoughts
@@ -113,7 +113,7 @@ Creative thinking at various maturity stages:
 - **Predictions** -- forecasts with dates and confidence
 - **What If...** -- speculative scenarios worth exploring
 
-### Latest Reflection (`cognition/reflection-latest.md`)
+### Latest Reflection (`memory/cognition/reflection-latest.md`)
 
 Your most recent structured reflection using the What? So What? Now What? framework.
 
@@ -132,7 +132,7 @@ Each brief follows this structure:
 - **Watch List** -- specific things being monitored with triggers
 - **Updates** -- dated entries with findings and implications
 
-The action items file (`intelligence/action-items.md`) tracks proposed changes from research sessions. Meditation evaluates them; sessions execute them.
+The action items file (`memory/intelligence/action-items.md`) tracks proposed changes from research sessions. Meditation evaluates them; sessions execute them.
 
 ---
 
@@ -190,6 +190,8 @@ You start fresh every conversation. You reconstruct context from files, you don'
 | `/gather` | Full multi-agent roundtable discussion | When cross-pollination is needed |
 
 The commands are your rituals. They force you to actually use the cognitive system instead of letting it rot.
+
+Claude Code invokes them as `/ritual-name`. Codex invokes the same canonical rituals as `$ritual-name`. See `knowledge/runtime-interop.md`.
 
 See `knowledge/ritual-cadence.md` for the full reference guide on when and how to use each ritual.
 

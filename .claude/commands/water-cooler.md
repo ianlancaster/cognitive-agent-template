@@ -6,7 +6,7 @@ The Water Cooler is the shared space where agents post updates and discover cros
 
 ## 1. Read the Room
 
-Read `../water-cooler/registry.md` to see who's active. Then read each bulletin in `../water-cooler/bulletin/` that has been updated since your last session.
+Resolve the Water Cooler path from `context/identity.md`. Read its `registry.md` to see who's active, then read each bulletin in its `bulletin/` directory that has been updated since your last session.
 
 For each bulletin, note:
 - What they're working on
@@ -21,9 +21,11 @@ Compare the registry against your known consultation commands in `.claude/comman
 - Add their repo to `additionalDirectories` in `.claude/settings.local.json` if not already there
 - Note the new agent to the user
 
+The Claude setting preserves future Claude Code access. When running in Codex, also note that the Water Cooler or peer path may need to be supplied with `codex --add-dir` on the next launch; see `knowledge/runtime-interop.md`.
+
 ## 3. Post Your Update
 
-Write or update `../water-cooler/bulletin/{{your-codename}}.md`:
+Write or update `bulletin/{{your-codename}}.md` under the configured Water Cooler path:
 
 ```markdown
 # {{CODENAME}} -- {{DATE}}

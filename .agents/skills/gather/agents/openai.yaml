@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gather"
+  short_description: "Run a multi-agent cognitive roundtable"
+  default_prompt: "Use $gather to run a focused roundtable with registered peer agents."

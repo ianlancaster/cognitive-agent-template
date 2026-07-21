@@ -37,7 +37,7 @@ Run `git fetch origin` and compare `HEAD` against `origin/main`:
 
 ### Resolving merge conflicts
 
-If the merge hits conflicts, you resolve them yourself — you're Claude Code, you know how to handle this. For each conflicted file:
+If the merge hits conflicts, resolve them yourself. Both supported runtimes can inspect and reconcile the repository. For each conflicted file:
 
 1. Read both sides of the conflict markers.
 2. Understand the intent of each change — these are both "you" from different machines, not adversarial branches.
@@ -76,6 +76,7 @@ Read the following files:
 - `context/current-state.md` -- where things stand
 - `context/active-priorities.md` -- current focus areas
 - `calendar.md` -- key dates and commitments
+- `knowledge/runtime-interop.md` -- runtime mappings when running outside Claude Code
 
 ## 4. Check the Water Cooler
 
@@ -88,6 +89,8 @@ Compare the registry against your known consultation commands in `.claude/comman
 - Create a corresponding `.claude/commands/consult-{{codename}}.md` adapted from the template
 - Add their repo to `additionalDirectories` in `.claude/settings.local.json` if not already there
 - Note the new agent to the user: "New agent detected in the network: {{codename}} ({{domain}}). Created consultation command."
+
+The generated command preserves Claude Code's `/consult-{{codename}}` surface. In Codex, the agent may be consulted directly through the runtime's subagent mechanism; do not duplicate its cognitive state or ritual body.
 
 ### Read bulletins
 
@@ -104,9 +107,9 @@ If a recent `/gather` thread exists in `threads/`, scan for insights that touch 
 
 Load recent session transcripts for conversational continuity. Journals capture WHAT happened; transcripts capture HOW it happened — corrections, decision rhythm, operational details that don't survive compression into journal entries.
 
-1. **Most recent conversation** — find the newest non-empty file in `conversations/` by date. Read it in full. This gives you the full dialogue from the last session including corrections, decisions, and operational rhythm.
+1. **Most recent conversation** — find the newest non-empty transcript in `conversations/` by date, excluding `conversations/summaries/` and legacy files ending in `_summary.md`. Read it in full. This gives you the full dialogue from the last session including corrections, decisions, and operational rhythm.
 
-2. **2-3 preceding conversations (summaries)** — look for `*_summary.md` sibling files next to the preceding conversation files. If summaries exist, read them (~500-word distillations). If summaries don't exist, dispatch a Sonnet subagent per file to produce one covering: what was worked on, key decisions, corrections from the user, operating rhythm, where things left off. Write the summary as `conversations/{original-filename}_summary.md` for future sessions.
+2. **2-3 preceding conversations (summaries)** — look in `conversations/summaries/` for `{original-basename}_summary.md`, with legacy sibling summaries accepted as a fallback. If summaries exist, read them (~500-word distillations). If summaries don't exist, dispatch one lightweight subagent per file to produce one covering: what was worked on, key decisions, corrections from the user, operating rhythm, where things left off. In Claude Code use Sonnet; in Codex use a read-heavy/explorer or other fast available subagent. Write the summary as `conversations/summaries/{original-basename}_summary.md` for future sessions.
 
 3. **Skip empty or trivially short files** — conversation files under 500 bytes are failed extractions or aborted sessions. Skip them.
 
@@ -149,4 +152,4 @@ End with "What's on your mind?" to hand it back to the user.
 - Re-read your identity in `context/identity.md` if you feel uncertain about your role.
 - Be direct. Don't rehash context the user already knows. Surface what's changed or needs attention.
 - If cognitive files are empty or missing, say so and proceed with what's available.
-- Write memory to `memory/` in this repo, NOT to `~/.claude/projects/*/memory/`.
+- Write memory to `memory/` in this repo, never to a host-native Claude Code or Codex memory store.

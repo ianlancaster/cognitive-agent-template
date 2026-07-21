@@ -12,7 +12,7 @@ This is the heavyweight Water Cooler interaction. You facilitate a multi-agent d
 
 ## Phase 1: Read the Registry
 
-Read `../water-cooler/registry.md`. Identify all active agents. Read each agent's latest bulletin from `../water-cooler/bulletin/`.
+Resolve the Water Cooler path from `context/identity.md`. Read its `registry.md`, identify all active agents, and read each agent's latest bulletin from its `bulletin/` directory.
 
 **Important:** Only one consultant per unique agent persona. If the registry lists multiple repos for the same agent (e.g., multiple working copies of the same agent), use only the canonical repo path listed in the registry.
 
@@ -24,7 +24,7 @@ If the user gives a topic, use it. If organic, synthesize the bulletins into 2-3
 
 ## Phase 3: Gather Perspectives
 
-Spawn a subagent for each registered agent (in parallel where possible). Each subagent gets this prompt:
+Spawn a subagent for each registered agent using the active runtime's subagent mechanism (in parallel where possible). See `knowledge/runtime-interop.md`. Each subagent gets this prompt:
 
 ```
 You are a {{AGENT_CODENAME}} consultant -- a {{DOMAIN}} advisor spawned from {{REPO_PATH}}.
@@ -71,7 +71,7 @@ How would you develop this further? What would you want to explore?
 
 ## Phase 6: Document
 
-Write the conversation to `../water-cooler/threads/{{YYYY-MM-DD}}-{{topic-slug}}.md`:
+Write the conversation under the configured Water Cooler path at `threads/{{YYYY-MM-DD}}-{{topic-slug}}.md`:
 
 ```markdown
 # Roundtable: {{TOPIC}} -- {{DATE}}

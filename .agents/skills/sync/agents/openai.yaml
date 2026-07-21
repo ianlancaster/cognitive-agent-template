@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sync"
+  short_description: "Apply cognitive template infrastructure updates"
+  default_prompt: "Use $sync to check for and apply cognitive template infrastructure updates."
