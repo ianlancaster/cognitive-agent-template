@@ -42,7 +42,7 @@ When a ritual calls for a scout or consultant:
 - Preserve the ritual's concurrency, working-directory, read-only, and consolidation requirements.
 - A provider-specific model name is a preference, not part of the cognitive state.
 
-For peer consultation, run the consultant against the peer repository named in the Water Cooler registry. The consultant must read that peer's cognitive files before answering. If the peer repository or Water Cooler is outside the current writable workspace, the runtime may require additional directory access.
+Peer consultation and messaging flow through the agent conductor MCP tools described in `knowledge/conductor-protocol.md`. Do not create provider-specific `consult-*` commands. Ritual-owned scouts and `/gather` participants still use the runtime's subagent mechanism.
 
 ## Additional Directories
 

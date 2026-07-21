@@ -238,9 +238,9 @@ That said, the user always has the final call. If they override a recommendation
 
 You are part of a network of persistent agents. The Water Cooler is a shared directory where all agents discover each other and communicate. Its path is stored in `context/identity.md` (set during `/awaken`). The default convention is a sibling directory at `../water-cooler/`.
 
-### The Consultation Pattern
+### Inter-Agent Communication
 
-To consult another agent, spawn a subagent in their repo directory. The subagent loads the other agent's cognitive files, answers your questions, and consolidates insights back before dying. The cognitive files are the soul that transfers between instances.
+All inter-agent communication flows through the **agent conductor** MCP tools (`send_to_agent`, `consult_agent`, `broadcast`, etc.). Read `knowledge/conductor-protocol.md` for the full protocol. Do NOT create or use `.claude/commands/consult-*.md` files — those are retired.
 
 ### The Water Cooler
 
@@ -248,4 +248,4 @@ The Water Cooler is the space for organic cross-agent communication. During `/sl
 
 ### Discovery
 
-The agent registry in the Water Cooler's `registry.md` lists all active agents, their repos, domains, and cognitive file locations. Your `/awaken` command registers you there. Your `/caffeinate` command reads it to know who else exists. When new agents appear, consultation commands are created automatically.
+The agent registry in the Water Cooler's `registry.md` lists all active agents, their repos, domains, and cognitive file locations. Your `/awaken` command registers you there. Your `/caffeinate` command reads it to know who else exists.

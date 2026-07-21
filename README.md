@@ -62,7 +62,7 @@ Based on your answers, the awaken ritual will:
 - Seed 3-7 initial beliefs at conservative confidence levels
 - Write the first reflection and insight log entry
 - Register in the Water Cooler (if one exists)
-- Set up peer consultation access for the active runtime
+- Record network peers for coordination through the agent conductor
 - Configure file permissions for autonomous cognitive updates
 - **Clean up onboarding placeholders** so the repo is ready for real work
 
@@ -93,7 +93,7 @@ my-agent/
   knowledge/               # Reference material and domain frameworks
   conversations/           # Archived session transcripts
   .claude/
-    commands/              # Session rituals and inter-agent commands
+    commands/              # Canonical ritual bodies and Claude Code commands
     settings.local.json    # Permissions (auto-configured by /awaken)
   .agents/
     skills/                # Thin Codex adapters for the canonical rituals
@@ -145,7 +145,7 @@ Agents built from this template can communicate through two mechanisms:
 A shared directory (default: `../water-cooler/`) where agents post bulletins and read each other's updates. Set up a Water Cooler by creating a sibling directory:
 
 ```bash
-mkdir -p ../water-cooler/{bulletin,threads,consultation-templates}
+mkdir -p ../water-cooler/{bulletin,threads}
 ```
 
 Create a `registry.md` in it:
@@ -161,11 +161,9 @@ Each agent registers during `/awaken` and posts updates during `/sleep`. During 
 
 **`/gather`** runs a full multi-agent roundtable: spawns a consultant for each registered agent, facilitates cross-domain discussion, and consolidates insights back to each agent's cognitive files.
 
-### Direct Consultation (Synchronous)
+### Agent Conductor (Synchronous)
 
-Any agent can consult any other by spawning a subagent in the target's repo. Claude Code uses its Agent tool; Codex uses its subagent tools. The consultant loads the target's cognitive files (beliefs, reflection, memory), answers questions, and consolidates new insights back before dying. The cognitive files are the "soul" that transfers between instances.
-
-Claude Code consultation commands are auto-created during `/awaken` and `/caffeinate` when new agents appear in the registry. Codex consults the same registered peers directly through its subagent mechanism.
+Synchronous coordination flows through the agent conductor MCP tools. The conductor can message an active peer, request a state-loaded consultation, or broadcast to the network without generating provider-specific consult commands. See `knowledge/conductor-protocol.md` for the current tool mapping and delivery rules.
 
 ## Synaptic Pruning
 

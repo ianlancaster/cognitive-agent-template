@@ -229,7 +229,7 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 
 **Biweekly, or before meditation:** `/research`.
 
-**When a peer-agent interaction is load-bearing:** `/water-cooler` (read + post) or spawn a specific `/consult-{agent}`.
+**When a peer-agent interaction is load-bearing:** `/water-cooler` (read + post) or use the agent conductor for a direct consultation.
 
 **When every agent's work intersects on one question:** `/gather`. Rarely.
 

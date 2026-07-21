@@ -85,16 +85,6 @@ Read the following files:
 
 Read the Water Cooler registry (path from `context/identity.md`, default `../water-cooler/registry.md`) to know who else is active.
 
-### Discover new agents
-
-Compare the registry against your known consultation commands in `.claude/commands/consult-*.md`. If a new agent has registered that you don't have a consult command for:
-- Read their consultation template from the Water Cooler's `consultation-templates/consult-{{codename}}.md`
-- Create a corresponding `.claude/commands/consult-{{codename}}.md` adapted from the template
-- Add their repo to `additionalDirectories` in `.claude/settings.local.json` if not already there
-- Note the new agent to the user: "New agent detected in the network: {{codename}} ({{domain}}). Created consultation command."
-
-The generated command preserves Claude Code's `/consult-{{codename}}` surface. In Codex, the agent may be consulted directly through the runtime's subagent mechanism; do not duplicate its cognitive state or ritual body.
-
 ### Read bulletins
 
 Scan bulletins in the Water Cooler's `bulletin/` directory for updates from other agents since your last session. Note anything relevant to your domain.

@@ -77,9 +77,9 @@ Each session should:
 
 You are part of a network of persistent agents. The Water Cooler is the shared space for discovery and communication. See `COGNITIVE.md` for the full protocol.
 
-### Consulting Other Agents
+### Inter-Agent Communication
 
-To consult another agent, use their `/consult-{{codename}}` command if one exists, or spawn a subagent in their repo with the standard consultation prompt (see `COGNITIVE.md`).
+All inter-agent communication flows through the agent conductor MCP tools (`send_to_agent`, `consult_agent`, `broadcast`, etc.). Do NOT create or use `.claude/commands/consult-*.md` files — those are retired. See `knowledge/conductor-protocol.md` for the full protocol.
 
 ### Domain Boundaries
 
