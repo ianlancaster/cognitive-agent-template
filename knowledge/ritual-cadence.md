@@ -15,7 +15,8 @@ The rituals are not calendar chores. They are cognitive tools. Each one does som
 | `/awaken` | First run | Once, ever |
 | `/caffeinate` | Session start | Every session, non-optional |
 | `/nap` | Mid-session mini-consolidation | After major deliverables in a continuing session |
-| `/sleep` | Session end | When the session concludes |
+| `/sleep` | Session end (FAST) | When the session concludes — minutes, not an hour |
+| `/deep-sleep` | Session end (FULL audit) | Every ~5 standard sleeps, before/after `/meditate`, or at arc boundaries |
 | `/meditate` | Deep recalibration | ~Monthly, or after a framework-level shift |
 | `/research` | Domain scanning | ~Biweekly, or when a specific question needs external evidence |
 | `/water-cooler` | Lightweight peer sync | Standalone when bulletins are worth checking mid-session |
@@ -27,7 +28,7 @@ The rituals are not calendar chores. They are cognitive tools. Each one does som
 
 Think of the rituals as operating at four distinct levels:
 
-1. **Session-local** (`/caffeinate`, `/nap`, `/sleep`) — manage state within a single working session
+1. **Session-local** (`/caffeinate`, `/nap`, `/sleep`, `/deep-sleep`) — manage state within a single working session
 2. **Cross-session** (`/meditate`) — recalibrate across the full history
 3. **Domain-external** (`/research`) — pull in what the world knows
 4. **Inter-agent** (`/water-cooler`, `/gather`) — sync with the network
@@ -78,24 +79,42 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 
 ---
 
-### `/sleep` — session end
+### `/sleep` — session end (the FAST standard)
 
-**What it does.** Full consolidation: journal, state, cognitive files, memory audit (parallel scouts), water cooler post, archive, commit.
+**What it does.** Fast consolidation — minutes, not an hour: reflection with the binding handoff, state banner (replace-not-append), short journal, insight/belief flags (append-only), water cooler post, archive + summary via subagent, commit. The heavy audit work is deliberately excluded; it lives in `/deep-sleep`.
 
 **Warranted when.** Session is ending. Also: session crossed a natural boundary (major phase of work completed) and you want a clean point for the next session to resume from.
 
 **Not warranted when.** Almost always warranted if there's real session work to preserve. The only time to skip is if the entire session was trivial (a single quick answer with no belief or priority implications).
 
 **How to get more from it.**
-- **The reflection is the thinking, not the documentation.** The What/So-What/Now-What format is a forcing function. Write it slowly. The patterns you catch while writing are the point.
-- **Trust the scout pattern.** Read the reports carefully before deciding what to apply.
-- **Resist the urge to upgrade confidence.** If new evidence arrived this session, that's momentum, not epistemics. Flag for next `/meditate`; don't apply the upgrade now.
+- **The reflection is the thinking, not the documentation.** The What/So-What/Now-What format is a forcing function. Write it slowly — it is the ONE phase of the fast sleep that must not be rushed. Everything else can be terse.
+- **The handoff is the highest-value artifact.** Your next session is a stranger who knows only what you wrote down.
+- **Resist the urge to upgrade confidence.** If new evidence arrived this session, that's momentum, not epistemics. Flag it in the digest's standing flags for the next `/meditate`; don't apply the upgrade now.
 - **Journal entry as training data for future-you.** Write for a version of yourself that doesn't have this session's context. Future sessions need to reconstruct the reasoning, not just the outcomes.
 
 **Common failure modes.**
 - Rushing the reflection to "finish the ritual." That's the opposite of what it's for.
 - Treating the journal as a changelog. It's not. It's a record of **why**, not just **what**.
-- Skipping the memory audit because it "seems fine." The scouts exist because you can't see what you miss. They catch specifically what your own judgment overlooks.
+- Letting fast sleeps pile up forever. The fast path accumulates debt (unarbitrated flags, missing summaries, index drift) by design — the debt rule exists to clear it.
+
+---
+
+### `/deep-sleep` — session end (the FULL audit)
+
+**What it does.** Everything `/sleep` does, plus the debt-clearing work: template sync, belief-file evidence appends and digest regeneration, ideation gardening, the three-scout memory audit (coherence / structure / index), and conversation-summary backfill. It SUBSUMES `/sleep` — never run both.
+
+**Warranted when.** After ~5 standard sleeps · immediately before or after a `/meditate` · at a major arc boundary · when fast-sleep debt is visible (stale summaries, unarbitrated belief flags, index drift).
+
+**Not warranted when.** Routine session ends — that's what the fast `/sleep` is for. Running the full audit nightly burns tokens re-verifying things that haven't changed.
+
+**How to get more from it.**
+- **Trust the scout pattern.** Three read-only scouts run in parallel; read the reports carefully before deciding what to apply — some findings are false positives, and you are the judge.
+- **Deep-sleep preps evidence; `/meditate` arbitrates.** Append evidence and clear absorbed flags here, but leave contested or structural belief changes (merges, splits, invalidations) flagged for meditation.
+
+**Common failure modes.**
+- Skipping the memory audit because it "seems fine." The scouts exist because you can't see what you miss.
+- Treating deep-sleep as optional polish. The fast `/sleep` only stays fast because this ritual exists to pay its debts.
 
 ---
 
@@ -204,7 +223,7 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 
 **After each major deliverable:** ask "does this deliverable change anything — a belief, a priority, my understanding?" If yes → `/nap`. If no → keep working.
 
-**At session end:** `/sleep`. Always, unless the session was trivial.
+**At session end:** `/sleep`. Always, unless the session was trivial. Every ~5th sleep — or before/after a `/meditate`, or at an arc boundary — run `/deep-sleep` instead.
 
 **Monthly, or after framework shifts:** `/meditate`.
 
@@ -251,7 +270,7 @@ The system rewards light, thoughtful use over heavy, mechanical use.
 
 **"My beliefs never change."** You're either in a domain where they shouldn't, or the rituals aren't stress-testing. Try `/research` to inject external evidence, then `/meditate`.
 
-**"My sleeps are too long."** Check if the scout pattern is deploying in parallel. If it is, the remaining cost is reflection — which should be thoughtful, not fast. If sleeps feel interminable, you might be conflating `/sleep` with `/meditate`. Meditations are slow; sleeps should be moderate with the scout pattern.
+**"My sleeps are too long."** A standard `/sleep` should take minutes — if it doesn't, you're doing deep-sleep work (scouts, belief editing, summary backfill) on the fast path; stop, and let `/deep-sleep` pay that debt at the next boundary. If `/deep-sleep` itself feels interminable, check that the three scouts are deploying in parallel; the remaining cost is reflection, which should be thoughtful, not fast.
 
 **"Caffeinate is boring."** If the ready-up isn't surfacing anything useful, either nothing has changed (valid — skip the commentary) or the cognitive files are stale (fix them in the next `/sleep`).
 

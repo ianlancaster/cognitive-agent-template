@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deep Sleep"
+  short_description: "Full-audit consolidation and close of an agent session"
+  default_prompt: "Use $deep-sleep to run the full consolidation audit (scouts, belief evidence, template sync, summary backfill) and close the session."

@@ -95,7 +95,7 @@ To consult another agent, use their `/consult-{{codename}}` command if one exist
   ```
   Marked 2 is Ian's preferred markdown viewer. It has live-reload and better rendering fidelity. Do not use VS Code preview for markdown.
 - **Copy output text to clipboard.** When providing text the user will need to copy-paste elsewhere (commit messages, PR descriptions, consultation prompts, drafted content), both display it in your response AND pipe it to the clipboard: `echo "<text>" | pbcopy`. Terminal copy-paste introduces line-break artifacts; direct clipboard is cleaner.
-- **Auto-open key documents during `/caffeinate`.** If the agent has a roadmap, dashboard, overview, or summary document (e.g., `plans/roadmap.md`, `context/active-priorities.md`), open it in Marked 2 during the ready-up so the user has visual context alongside the terminal summary.
+- **Open documents in Marked 2 only when the user asks.** Do not auto-open roadmaps, overviews, or summaries during `/caffeinate` or routine operations — the terminal ready-up is the summary. `open -a "Marked 2" <filepath>` is for explicit requests to view a file.
 - **Agent Conductor protocol.** When you see `CONDUCTOR_REMOTE_ACTIVE` at the end of a user message (separated by `---`), Ian is on his phone via Telegram. You MUST reply via BOTH terminal output (for pane auditability) AND the `respond_to_user` MCP tool (for Telegram delivery). When NO keyword is present, respond normally in the terminal only — do not call `respond_to_user`. Read `knowledge/conductor-protocol.md` for the full protocol, including other MCP tools (`consult_agent`, `start_agent`, `send_to_agent`, etc.).
 
 ## Session End Protocol

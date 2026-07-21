@@ -4,6 +4,8 @@ description: Prime for a new session -- load cognitive state, check status, read
 
 You are starting a fresh session. Do all of the following silently (don't narrate each step), then present a concise ready-up summary.
 
+**CONTEXT BUDGET (hard discipline): the wake should land at ≤ ~12-15% of the context window.** The diet is deliberate — a heavy wake steals the session's working room, and loading the RIGHT set is the work. Do not "helpfully" load beyond this protocol. Everything not loaded here is one lazy read away when a task actually needs it — that is the point of the indexes. The fidelity gradient at wake is: reflection handoff → conversation summaries → beliefs digest. Raw transcripts and full evidence files are for forensics, never for waking.
+
 ## Pre-flight: Template-State Guard
 
 **Before anything else, check for `.template-marker` at the repo root.** If that file exists:
@@ -56,17 +58,18 @@ Never auto-push after a merge — that's `/sleep`'s job.
 
 Once the sync is complete (or skipped), continue with Phase 1.
 
-## 1. Load Cognitive State
+## 1. Load Cognitive State (the compact set)
 
-Read these files to understand what you currently believe and where your thinking left off:
-- `memory/cognition/beliefs.md` -- your current domain beliefs and confidence levels
-- `memory/cognition/reflection-latest.md` -- where your thinking left off last session
+- `memory/cognition/beliefs-digest.md` if it exists — the belief working set (one line per belief + standing flags). **When a digest exists, do NOT read the full `beliefs.md` at wake** — the full file (evidence + evolution) is for `/meditate`, arbitration, or when a live decision turns on a specific belief's evidence. If no digest exists yet, read `memory/cognition/beliefs.md` (and consider creating a digest at your next `/meditate` — it is the single biggest wake-cost reducer once the beliefs file grows).
+- `memory/cognition/reflection-latest.md` — where the last session left off. **The Session Handoff section is binding:** apply its corrections silently and follow its resume pointer.
 
-## 2. Load Memory
+## 2. Load Memory (index-first, lazy bodies)
 
-Read `memory/MEMORY.md` to see all memory files. Scan any that seem relevant to likely work for this session. Pay special attention to gotchas and feedback memories.
+Read `memory/MEMORY.md` (the index). Open ONLY the memory files clearly relevant to the queued work — the handoff names them; add the gotcha/feedback files for the session's domain. Everything else stays unopened: you know it exists and where it lives; fetch on demand at task time.
 
 Check `memory/intelligence/action-items.md` if it exists. Surface any proposed or accepted action items that haven't been completed.
+
+**Task-time loading contract (binding):** any deep document your domain requires for a dispatch, review, or ruling loads IN FULL at the moment that task first arises in the session — not at wake, and never summarized-instead-of-read. The wake gets you the map; the task gets the territory.
 
 ## 3. Load Context
 
@@ -103,17 +106,15 @@ If a recent `/gather` thread exists in `threads/`, scan for insights that touch 
 - Read the most recent journal entry in `journal/` to understand what happened last session
 - Check for any new memory files that may have been written by a consultation subagent
 
-## 5b. Load Recent Conversation History
+## 5b. Load Recent Conversation History — summaries ONLY
 
-Load recent session transcripts for conversational continuity. Journals capture WHAT happened; transcripts capture HOW it happened — corrections, decision rhythm, operational details that don't survive compression into journal entries.
+Read the 2-3 newest summaries in `conversations/summaries/` (`{original-basename}_summary.md`; legacy sibling `_summary.md` files accepted as fallback). **Never read raw transcripts at wake** — a full transcript can cost more context than the entire rest of the wake combined, and the reflection handoff already carries the binding corrections.
 
-1. **Most recent conversation** — find the newest non-empty transcript in `conversations/` by date, excluding `conversations/summaries/` and legacy files ending in `_summary.md`. Read it in full. This gives you the full dialogue from the last session including corrections, decisions, and operational rhythm.
+If the most recent session has no summary (a missed `/sleep` step), dispatch ONE cheap subagent (in Claude Code: Sonnet; in Codex: a fast read-heavy subagent) to produce it from the transcript — covering what was worked on, key decisions, corrections from the user, operating rhythm, where things left off — written to `conversations/summaries/{original-basename}_summary.md`. Then read the summary.
 
-2. **2-3 preceding conversations (summaries)** — look in `conversations/summaries/` for `{original-basename}_summary.md`, with legacy sibling summaries accepted as a fallback. If summaries exist, read them (~500-word distillations). If summaries don't exist, dispatch one lightweight subagent per file to produce one covering: what was worked on, key decisions, corrections from the user, operating rhythm, where things left off. In Claude Code use Sonnet; in Codex use a read-heavy/explorer or other fast available subagent. Write the summary as `conversations/summaries/{original-basename}_summary.md` for future sessions.
+Skip conversation files under 500 bytes (failed extractions or aborted sessions).
 
-3. **Skip empty or trivially short files** — conversation files under 500 bytes are failed extractions or aborted sessions. Skip them.
-
-The fidelity gradient: full transcript (last session) → summaries (2-3 sessions back) → cognitive files (long-term memory). This ensures conversational context survives across sessions without overwhelming the context window.
+The fidelity gradient: reflection handoff (binding) → summaries (2-3 sessions back) → beliefs digest + cognitive files (long-term memory). Raw transcripts are for forensics only — when a specific dispute needs verbatim evidence, at task time.
 
 ## 6. Check the Clock
 
@@ -127,11 +128,12 @@ Note today's date and current time. Use these to ground the ready-up:
 Infer the state of each ritual from artifacts you've already loaded. No extra files to read — just reason about what you've seen:
 
 - **Last `/sleep`**: Check the most recent journal entry date. If there's no journal for the previous session (or the latest reflection feels stale relative to `current-state.md`), a `/sleep` was likely skipped. Flag it.
+- **Last `/deep-sleep`**: Count recent `sleep:` commits since the last `deep-sleep:` commit (or infer from journal entries). If 5+ standard sleeps have passed, a `/meditate` is upcoming, or a major arc boundary is near — recommend `/deep-sleep` as the next session-end ritual.
 - **Last `/meditate`**: Check `reflection-latest.md` for meditation references, and scan recent journal entries for meditation arcs. If the last meditation was > 4 weeks ago, flag it as overdue.
 - **Last `/research`**: Check intelligence brief dates in `memory/intelligence/`. If briefs are > 2 weeks old, flag research as overdue. If a meditation is also overdue, recommend the `/research` → `/meditate` sequence.
-- **Pending belief changes**: Check `beliefs.md` for entries flagged "for next meditation" or similar. If any exist and no meditation has run since, flag that meditation should arbitrate them.
+- **Pending belief changes**: Check the digest's "Standing flags" (or `beliefs.md` if no digest) for entries flagged for the next meditation. If any exist and no meditation has run since, flag that meditation should arbitrate them.
 - **Unanswered peer questions**: If Water Cooler bulletins had questions directed at you and you haven't responded, note it.
-- **Template sync**: Read `.template-sync.json` if it exists. If `syncMode` is not `"off"` and `lastSyncDate` is more than 2 weeks ago, note it: "Template sync hasn't run in X days — next `/sleep` will check for updates." If `syncMode` is `"off"` or the file doesn't exist, don't mention it.
+- **Template sync**: Read `.template-sync.json` if it exists. If `syncMode` is not `"off"` and `lastSyncDate` is more than 2 weeks ago, note it: "Template sync hasn't run in X days — sync runs at `/deep-sleep`." If `syncMode` is `"off"` or the file doesn't exist, don't mention it.
 
 ## 8. Present the Ready-Up
 

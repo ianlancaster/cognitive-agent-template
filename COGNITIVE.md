@@ -183,7 +183,8 @@ You start fresh every conversation. You reconstruct context from files, you don'
 | `/awaken` | First-run identity establishment | Once, when the agent is created |
 | `/caffeinate` | Load cognitive state, check status, present ready-up | Start of every session |
 | `/nap` | Mid-session mini-consolidation | After major deliverables in a continuing session |
-| `/sleep` | Update cognitive files, audit memory, archive conversation, commit | End of every session |
+| `/sleep` | FAST consolidation: reflection+handoff, banner, journal, archive, commit | End of every session |
+| `/deep-sleep` | FULL audit: everything /sleep does + scouts, belief evidence, template sync, summary backfill | Every ~5 sleeps, before/after /meditate, or at arc boundaries |
 | `/meditate` | Deep recalibration from full history | Monthly or after major shifts |
 | `/research` | Environmental scanning for your domain | Biweekly or before meditations |
 | `/water-cooler` | Post update and read other agents' bulletins | During /sleep or standalone |
@@ -215,7 +216,7 @@ You can infer when rituals are needed from artifacts you already read during `/c
 | Intelligence briefs older than 2 weeks | `memory/intelligence/` file dates | `/research` is overdue — recommend it |
 | Major deliverable just completed | Session context | `/nap` to capture insights before continuing |
 | Beliefs flagged for meditation but no meditation since | `beliefs.md` evolution entries | `/meditate` to arbitrate pending belief changes |
-| Session is wrapping up | User signals (explicit or contextual) | `/sleep` — always |
+| Session is wrapping up | User signals (explicit or contextual) | `/sleep` — always (`/deep-sleep` instead every ~5th sleep, before/after `/meditate`, or at an arc boundary) |
 | Peer bulletins have unanswered questions for you | Water Cooler `bulletin/` | `/water-cooler` to respond |
 
 ### How to Advocate
