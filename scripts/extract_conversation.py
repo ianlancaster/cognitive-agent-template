@@ -25,6 +25,12 @@ SYSTEM_TAG_PATTERNS = [
     re.compile(r"<environment_context>.*?</environment_context>", re.DOTALL),
 ]
 
+# Outbound conductor communications are conversation, not tool noise: they are
+# the only tool calls preserved in archives. All other tool traffic is dropped.
+# Intent/content only — delivery receipts are transport state and stay out.
+CONDUCTOR_SEND_TOOLS = {"send_to_session", "send_to_operator", "broadcast"}
+CONDUCTOR_TOOL_RE = re.compile(r"^mcp__conductor__(send_to_session|send_to_operator|broadcast)$")
+
 
 @dataclass(frozen=True)
 class Session:
@@ -67,6 +73,34 @@ def block_text(content: object, accepted_types: set[str]) -> str:
     return "\n\n".join(parts)
 
 
+def conductor_send(tool: str, arguments: object) -> tuple[str, str] | None:
+    if not isinstance(arguments, dict):
+        return None
+    message = arguments.get("message")
+    if not isinstance(message, str) or not message.strip():
+        return None
+
+    if tool == "send_to_session":
+        codename = arguments.get("codename")
+        target = codename if isinstance(codename, str) and codename else "unknown"
+        heading = f"Agent → session `{target}`"
+    elif tool == "send_to_operator":
+        heading = "Agent → operator"
+    elif tool == "broadcast":
+        heading = "Agent → all sessions"
+    else:
+        return None
+
+    body = message.strip()
+    options = arguments.get("options")
+    if isinstance(options, list):
+        string_options = [option for option in options if isinstance(option, str)]
+        if string_options:
+            bullets = "\n".join(f"- {option}" for option in string_options)
+            body = f"{body}\n\nOptions:\n{bullets}"
+    return heading, body
+
+
 def claude_turns(entries: Iterable[dict]) -> Iterator[tuple[str, str]]:
     for entry in entries:
         entry_type = entry.get("type")
@@ -78,25 +112,87 @@ def claude_turns(entries: Iterable[dict]) -> Iterator[tuple[str, str]]:
         role = message.get("role", entry_type)
         if role not in {"user", "assistant"}:
             continue
-        text = clean_text(block_text(message.get("content", ""), {"text"}))
-        if text:
-            yield role, text
+        content = message.get("content", "")
+        if role == "user" or not isinstance(content, list):
+            text = clean_text(block_text(content, {"text"}))
+            if text:
+                yield ("User" if role == "user" else "Agent"), text
+            continue
+        # Assistant blocks are walked in order so conductor sends keep their
+        # position relative to the surrounding visible text.
+        for item in content:
+            if not isinstance(item, dict):
+                continue
+            if item.get("type") == "text":
+                raw = item.get("text")
+                text = clean_text(raw) if isinstance(raw, str) else ""
+                if text:
+                    yield "Agent", text
+                continue
+            if item.get("type") != "tool_use":
+                continue
+            match = CONDUCTOR_TOOL_RE.match(str(item.get("name", "")))
+            if not match:
+                continue
+            send = conductor_send(match.group(1), item.get("input"))
+            if send:
+                yield send
+
+
+def codex_conductor_call(entry_type: object, payload: dict) -> tuple[object, str, object] | None:
+    payload_type = payload.get("type")
+    if entry_type == "event_msg" and payload_type == "mcp_tool_call_end":
+        invocation = payload.get("invocation")
+        if not isinstance(invocation, dict) or invocation.get("server") != "conductor":
+            return None
+        tool = invocation.get("tool")
+        if tool not in CONDUCTOR_SEND_TOOLS:
+            return None
+        return payload.get("call_id"), tool, invocation.get("arguments")
+    if entry_type == "response_item" and payload_type == "function_call":
+        match = CONDUCTOR_TOOL_RE.match(str(payload.get("name", "")))
+        if not match:
+            return None
+        arguments = payload.get("arguments")
+        if isinstance(arguments, str):
+            try:
+                arguments = json.loads(arguments)
+            except json.JSONDecodeError:
+                return None
+        return payload.get("call_id"), match.group(1), arguments
+    return None
 
 
 def codex_turns(entries: Iterable[dict]) -> Iterator[tuple[str, str]]:
+    seen_call_ids: set[object] = set()
     for entry in entries:
-        if entry.get("type") != "response_item":
-            continue
+        entry_type = entry.get("type")
         payload = entry.get("payload")
-        if not isinstance(payload, dict) or payload.get("type") != "message":
+        if not isinstance(payload, dict):
             continue
-        role = payload.get("role")
-        if role not in {"user", "assistant"}:
+        if entry_type == "response_item" and payload.get("type") == "message":
+            role = payload.get("role")
+            if role not in {"user", "assistant"}:
+                continue
+            accepted = {"input_text"} if role == "user" else {"output_text"}
+            text = clean_text(block_text(payload.get("content", []), accepted))
+            if text:
+                yield ("User" if role == "user" else "Agent"), text
             continue
-        accepted = {"input_text"} if role == "user" else {"output_text"}
-        text = clean_text(block_text(payload.get("content", []), accepted))
-        if text:
-            yield role, text
+        call = codex_conductor_call(entry_type, payload)
+        if call is None:
+            continue
+        call_id, tool, arguments = call
+        if isinstance(call_id, str) and call_id in seen_call_ids:
+            continue
+        send = conductor_send(tool, arguments)
+        if send is None:
+            continue
+        # Mark the call seen only once it rendered, so a malformed first
+        # representation never suppresses a valid duplicate.
+        if isinstance(call_id, str):
+            seen_call_ids.add(call_id)
+        yield send
 
 
 def detect_provider(entries: list[dict]) -> str | None:
@@ -151,10 +247,7 @@ def render_session(path: Path, provider: str = "auto") -> tuple[Session, str] | 
 
     metadata = session_metadata(path, resolved_provider, entries)
     turns = claude_turns(entries) if resolved_provider == "claude" else codex_turns(entries)
-    sections = [
-        f"## {'User' if role == 'user' else 'Agent'}\n\n{text}\n"
-        for role, text in turns
-    ]
+    sections = [f"## {heading}\n\n{text}\n" for heading, text in turns]
     if not sections:
         return None
     return metadata, "\n---\n\n".join(sections)

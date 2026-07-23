@@ -41,7 +41,7 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 
 ### `/caffeinate` — session start
 
-**What it does.** Loads cognitive state, reads context files, checks the Water Cooler, surfaces time-sensitive items, presents a ready-up.
+**What it does.** Loads cognitive state, reads context files, checks the Water Cooler (if enabled), surfaces time-sensitive items, presents a ready-up.
 
 **Warranted when.** Start of any session. No judgment call here — just run it.
 
@@ -81,7 +81,7 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 
 ### `/sleep` — session end (the FAST standard)
 
-**What it does.** Fast consolidation — minutes, not an hour: reflection with the binding handoff, state banner (replace-not-append), short journal, insight/belief flags (append-only), water cooler post, archive + summary via subagent, commit. The heavy audit work is deliberately excluded; it lives in `/deep-sleep`.
+**What it does.** Fast consolidation — minutes, not an hour: reflection with the binding handoff, state banner (replace-not-append), short journal, insight/belief flags (append-only), water cooler post (if enabled), archive + summary via subagent, commit. The heavy audit work is deliberately excluded; it lives in `/deep-sleep`.
 
 **Warranted when.** Session is ending. Also: session crossed a natural boundary (major phase of work completed) and you want a clean point for the next session to resume from.
 
@@ -174,7 +174,7 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 
 ### `/water-cooler` — lightweight peer sync
 
-**What it does.** Read the registry, scan bulletins, post your own bulletin. Lightweight — doesn't spawn consultants.
+**What it does.** Read the registry, scan bulletins, post your own bulletin. Lightweight — doesn't spawn consultants. Only applies when the Water Cooler is enabled (it's optional, off by default; invoking `/water-cooler` while disabled offers to enable it).
 
 **Warranted when.**
 - Mid-session, when you expect a peer has posted something relevant and haven't checked
@@ -206,7 +206,7 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 - When the user wants the network to think together on something specific
 
 **Not warranted when.**
-- The question fits in one agent's domain (use that agent's `/consult` instead)
+- The question fits in one agent's domain (message that agent directly via the conductor instead)
 - As a brainstorming kickoff (too expensive; the roundtable's value is synthesis, not ideation)
 - When you don't have a specific topic (organic roundtables produce low-signal output)
 
@@ -242,7 +242,7 @@ Each level has its own cadence. Mixing levels — e.g., running `/meditate` when
 | Context-driven skipping | "I have context headroom, I don't need to `/sleep`" | Context isn't the point of `/sleep`. Reflection is. Run it. |
 | Momentum-driven upgrading | Confidence climbs session after session, nothing decreases | `/meditate` to recalibrate; if you can't, hold confidence. |
 | Ritual as ceremony | Running `/meditate` every session because it's Monday | Only when warranted. Mechanical cadence produces hollow output. |
-| Solo design drift | Making design decisions alone when a peer could catch fragility | Use `/water-cooler` or a specific `/consult` before committing. |
+| Solo design drift | Making design decisions alone when a peer could catch fragility | Use `/water-cooler` or a direct conductor consultation before committing. |
 | Scout-pattern paranoia | Not trusting scouts because "I'm the judge" | Scouts report; you judge. That IS the split. Use them. |
 | Reflection as documentation | Writing the reflection fast because "I know what happened" | The writing IS the thinking. Slow down. |
 | Research as procrastination | "One more `/research` before I can decide" | At some point, deciding under uncertainty IS the answer. |

@@ -42,7 +42,7 @@ When a ritual calls for a scout or consultant:
 - Preserve the ritual's concurrency, working-directory, read-only, and consolidation requirements.
 - A provider-specific model name is a preference, not part of the cognitive state.
 
-Peer consultation and messaging flow through the agent conductor MCP tools described in `knowledge/conductor-protocol.md`. Do not create provider-specific `consult-*` commands. Ritual-owned scouts and `/gather` participants still use the runtime's subagent mechanism.
+Peer consultation and messaging flow through the Agent Conductor's injected protocol (see `knowledge/conductor-protocol.md` for where it lives). Do not create provider-specific `consult-*` commands. Ritual-owned scouts and `/gather` participants still use the runtime's subagent mechanism.
 
 ## Additional Directories
 

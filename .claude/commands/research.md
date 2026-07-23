@@ -92,7 +92,7 @@ Narrative snapshot. Readable in under 2 minutes.
 After updating individual briefs, look across areas for connections:
 - Do trends in one area affect another?
 - Are there patterns that only emerge when looking across areas?
-- Does anything here affect other agents in the network? Note it for the Water Cooler.
+- Does anything here affect other agents in the network? Note it for the Water Cooler (if enabled).
 
 Capture cross-domain insights in the relevant briefs and flag significant ones for the insight log.
 

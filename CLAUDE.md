@@ -75,11 +75,11 @@ Each session should:
 
 ## Inter-Agent Communication
 
-You are part of a network of persistent agents. The Water Cooler is the shared space for discovery and communication. See `COGNITIVE.md` for the full protocol.
+You may be part of a network of persistent agents. The Water Cooler is the shared space for discovery and communication — optional and off by default; rituals skip it unless a path is set in `context/identity.md`. See `COGNITIVE.md` for the full protocol.
 
 ### Inter-Agent Communication
 
-All inter-agent communication flows through the agent conductor MCP tools (`send_to_agent`, `consult_agent`, `broadcast`, etc.). Do NOT create or use `.claude/commands/consult-*.md` files — those are retired. See `knowledge/conductor-protocol.md` for the full protocol.
+Direct, synchronous inter-agent communication flows through the Agent Conductor's peer-messaging primitives, defined by the protocol the conductor injects at runtime; the Water Cooler remains the opt-in asynchronous mechanism. Do NOT create or use `.claude/commands/consult-*.md` files — those are retired. See `knowledge/conductor-protocol.md` for where the protocol lives.
 
 ### Domain Boundaries
 
@@ -96,7 +96,7 @@ All inter-agent communication flows through the agent conductor MCP tools (`send
   Marked 2 is Ian's preferred markdown viewer. It has live-reload and better rendering fidelity. Do not use VS Code preview for markdown.
 - **Copy output text to clipboard.** When providing text the user will need to copy-paste elsewhere (commit messages, PR descriptions, consultation prompts, drafted content), both display it in your response AND pipe it to the clipboard: `echo "<text>" | pbcopy`. Terminal copy-paste introduces line-break artifacts; direct clipboard is cleaner.
 - **Open documents in Marked 2 only when the user asks.** Do not auto-open roadmaps, overviews, or summaries during `/caffeinate` or routine operations — the terminal ready-up is the summary. `open -a "Marked 2" <filepath>` is for explicit requests to view a file.
-- **Agent Conductor protocol.** When you see `CONDUCTOR_REMOTE_ACTIVE` at the end of a user message (separated by `---`), Ian is on his phone via Telegram. You MUST reply via BOTH terminal output (for pane auditability) AND the `respond_to_user` MCP tool (for Telegram delivery). When NO keyword is present, respond normally in the terminal only — do not call `respond_to_user`. Read `knowledge/conductor-protocol.md` for the full protocol, including other MCP tools (`consult_agent`, `start_agent`, `send_to_agent`, etc.).
+- **Agent Conductor protocol.** When running managed, the operational protocol (messaging, lifecycle, transport) is injected at runtime — follow it. Replies to a remote operator must go through the conductor's operator-messaging tool; terminal output alone does not reach them. See `knowledge/conductor-protocol.md`.
 
 ## Session End Protocol
 
@@ -105,7 +105,7 @@ When the user signals a session is ending:
 2. Update `context/current-state.md` with any changes
 3. Update memory files for anything that should persist
 4. Update cognitive files (beliefs, insights, reflection, ideation)
-5. Post to the Water Cooler bulletin
+5. Post to the Water Cooler bulletin (if enabled)
 6. Run `./scripts/extract-conversation.sh` to archive the transcript
 7. Commit and push
 8. Confirm next actions are clear

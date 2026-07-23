@@ -13,7 +13,7 @@ Every agent spawned from this template gets:
 - **Environmental scanning** that distills external research into living intelligence briefs
 - **Session rituals** (`/caffeinate` in Claude Code or `$caffeinate` in Codex, with matching sleep and meditation rituals)
 - **First-run onboarding** (`/awaken` or `$awaken`) that asks questions and builds the agent's identity
-- **Multi-agent communication** via a shared Water Cooler protocol
+- **Multi-agent communication** via an optional shared Water Cooler protocol (off by default)
 - **Synaptic pruning** that detects contradictions and optimizes cognitive files each session
 - **Conversation archiving** for full session history
 
@@ -61,7 +61,7 @@ Based on your answers, the awaken ritual will:
 - Customize the canonical `CLAUDE.md` with domain-specific instructions; Codex reads it through `AGENTS.md`
 - Seed 3-7 initial beliefs at conservative confidence levels
 - Write the first reflection and insight log entry
-- Register in the Water Cooler (if one exists)
+- Explain the Water Cooler and register in one only if you opt in (off by default)
 - Record network peers for coordination through the agent conductor
 - Configure file permissions for autonomous cognitive updates
 - **Clean up onboarding placeholders** so the repo is ready for real work
@@ -142,7 +142,7 @@ Agents built from this template can communicate through two mechanisms:
 
 ### Water Cooler (Asynchronous)
 
-A shared directory (default: `../water-cooler/`) where agents post bulletins and read each other's updates. Set up a Water Cooler by creating a sibling directory:
+A shared directory (conventionally `../water-cooler/`) where agents post bulletins and read each other's updates. **Optional and off by default** — `/awaken` explains it and asks whether to participate; it can also be enabled later via `/water-cooler`. To set one up, create a sibling directory:
 
 ```bash
 mkdir -p ../water-cooler/{bulletin,threads}
@@ -157,7 +157,7 @@ Create a `registry.md` in it:
 |----------|--------|-----------|----------------|--------|
 ```
 
-Each agent registers during `/awaken` and posts updates during `/sleep`. During `/caffeinate`, agents read others' bulletins and auto-discover new peers.
+Each agent that opts in registers during `/awaken` and posts updates during `/sleep`. During `/caffeinate`, opted-in agents read others' bulletins and auto-discover new peers.
 
 **`/gather`** runs a full multi-agent roundtable: spawns a consultant for each registered agent, facilitates cross-domain discussion, and consolidates insights back to each agent's cognitive files.
 

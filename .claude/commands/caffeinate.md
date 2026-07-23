@@ -83,7 +83,9 @@ Read the following files:
 
 ## 4. Check the Water Cooler
 
-Read the Water Cooler registry (path from `context/identity.md`, default `../water-cooler/registry.md`) to know who else is active.
+**Skip this entire section if the Water Cooler is disabled** (`Water Cooler Path:` is `none` or absent in `context/identity.md` — the default).
+
+Read the registry at the Water Cooler path from `context/identity.md` (`registry.md`) to know who else is active.
 
 ### Read bulletins
 

@@ -185,7 +185,7 @@ When scouts return:
 
 ## 6. Post to Water Cooler
 
-Update your bulletin under the Water Cooler path stored in `context/identity.md`, at `bulletin/{{codename}}.md`: Working On / Recent Insights / Questions for Others / Connections Spotted.
+Skip if the Water Cooler is disabled (`Water Cooler Path:` is `none` or absent in `context/identity.md` — the default). Otherwise update your bulletin under that path, at `bulletin/{{codename}}.md`: Working On / Recent Insights / Questions for Others / Connections Spotted.
 
 ## 7. Archive Conversation and Backfill Summaries
 
@@ -202,9 +202,10 @@ git commit -m "deep-sleep: consolidation for YYYY-MM-DD"
 git push
 ```
 
-Also commit the water cooler bulletin update (path from `context/identity.md`, default `../water-cooler/`):
+If the Water Cooler is enabled, also commit the bulletin update (path from `context/identity.md`):
 ```bash
-cd "$(grep 'Water Cooler Path:' context/identity.md | sed 's/.*: //' | tr -d '`')" && git add bulletin/ && git commit -m "bulletin: {{codename}} update YYYY-MM-DD" && git push
+WC_PATH="$(grep 'Water Cooler Path:' context/identity.md | sed 's/.*: //' | tr -d '`' | xargs)"
+[ -n "$WC_PATH" ] && [ "$WC_PATH" != "none" ] && cd "$WC_PATH" && git add bulletin/ && git commit -m "bulletin: {{codename}} update YYYY-MM-DD" && git push
 ```
 
 Then the operator `SLEEP COMPLETE` signal (autonomous arcs only, ONLY after the push succeeds).

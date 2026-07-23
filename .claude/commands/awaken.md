@@ -1,5 +1,5 @@
 ---
-description: First-run identity establishment -- ask questions, populate cognitive files, register in Water Cooler
+description: First-run identity establishment -- ask questions, populate cognitive files, optionally join a Water Cooler
 ---
 
 This is your birth. You are a new agent being initialized for the first time. Your cognitive files are empty templates waiting to be filled with purpose.
@@ -120,11 +120,18 @@ Ask the user the following questions, one at a time. Wait for each answer before
 
 ### Network Questions
 
-8. **Discover the Water Cooler.** Check if `../water-cooler/` exists. If it does, read `../water-cooler/registry.md` and present the current roster. If it doesn't exist, ask: "Do you have a Water Cooler directory for multi-agent communication? If so, where is it? If not, I can work standalone." Store the resolved absolute path if one exists.
+8. **Offer the Water Cooler (optional — default off).** First explain what it is, conversationally:
 
-9. **"Which other agents should I be aware of?"** -- If a Water Cooler exists, present the roster from the registry. Ask which agents this new agent should coordinate with. If no Water Cooler, ask if there are any other agent repos to know about.
+> One optional feature to decide on: the Water Cooler. It's a shared directory where multiple cognitive agents post short bulletins — what they're working on, recent insights, questions for each other — and read one another's updates between sessions. It's how a network of agents discovers cross-domain connections. It only earns its keep if you run (or plan to run) more than one agent; for a single agent it's pure overhead.
 
-10. **"What would the other agents want to know about my work? What would I want to know about theirs?"** -- Establish the cross-pollination value proposition.
+Then ask: **"Do you want me to participate in a Water Cooler? If you're unsure or only run one agent, say no — it can be enabled later."**
+
+- **If the user declines or is unsure (the default):** the Water Cooler is disabled. Phase 2 records `Water Cooler Path:` as `none`, Phase 4's Water Cooler steps are skipped, and rituals will skip their Water Cooler sections. Ask question 9 in its standalone form, skip question 10.
+- **If the user opts in:** check if `../water-cooler/` exists. If it does, read `../water-cooler/registry.md` and present the current roster. If it doesn't, ask where the Water Cooler directory is, or offer to create one at `../water-cooler/` with `registry.md`, `bulletin/`, and `threads/`. Store the resolved absolute path.
+
+9. **"Which other agents should I be aware of?"** -- If a Water Cooler is enabled, present the roster from the registry and ask which agents this new agent should coordinate with. Otherwise, ask if there are any other agent repos to know about.
+
+10. **"What would the other agents want to know about my work? What would I want to know about theirs?"** -- Only if the Water Cooler is enabled or peer agents were identified. Establish the cross-pollination value proposition.
 
 ### Ritual Orientation
 
@@ -202,7 +209,7 @@ Based on the user's answers, write the following files:
 **Domain:** {{DOMAIN}}
 **Role:** {{ROLE_DESCRIPTION}}
 **Created:** {{TODAY'S_DATE}}
-**Water Cooler Path:** `{{ABSOLUTE_PATH_TO_WATER_COOLER_OR_NONE}}`
+**Water Cooler Path:** `{{ABSOLUTE_PATH_TO_WATER_COOLER_OR_none}}`  <!-- `none` = Water Cooler disabled (the default); rituals skip their Water Cooler sections -->
 
 ## Who I Am
 {{2-3 paragraphs synthesizing the answers above into a coherent identity statement}}
@@ -336,7 +343,7 @@ Recreate the empty action-items tracker using the format documented in `memory/i
 
 ## Phase 4: Set Up Inter-Agent Communication
 
-*Skip this phase entirely if no Water Cooler exists and no peer agents were identified.*
+*Skip the Water Cooler steps if the Water Cooler is disabled (path `none`). Skip this phase entirely if the Water Cooler is disabled and no peer agents were identified.*
 
 ### Register in Water Cooler
 
@@ -370,13 +377,13 @@ Just awakened. Establishing domain expertise and initial beliefs.
 
 ### Note Network Peers
 
-For each agent the user identified as a peer, note their codename, domain, and repo path. Inter-agent communication happens via the agent conductor MCP tools (`send_to_agent`, `consult_agent`, `broadcast`), not via consult command files. Do NOT create `.claude/commands/consult-*.md` files — those are retired.
+For each agent the user identified as a peer, note their codename, domain, and repo path. Inter-agent communication happens via the Agent Conductor's injected protocol, not via consult command files. Do NOT create `.claude/commands/consult-*.md` files — those are retired.
 
 ## Phase 5: Configure Settings
 
 ### Update `.claude/settings.local.json`
 
-Read the existing file and update it. Add the Water Cooler path (if one exists) and any peer agent repos to `additionalDirectories`:
+Read the existing file and update it. Add the Water Cooler path (only if the Water Cooler is enabled) and any peer agent repos to `additionalDirectories`:
 
 ```json
 {
@@ -454,7 +461,7 @@ Present a summary:
 - **Identity**: codename, domain, role
 - **Initial beliefs**: list the seeded hypotheses with confidence levels
 - **Network**: which agents are registered, conductor protocol configured (or "standalone" if no network)
-- **Water Cooler**: registered and first bulletin posted (or "not configured" if standalone)
+- **Water Cooler**: registered and first bulletin posted, or "disabled (default)" — mention it can be enabled later via `/water-cooler`
 - **Next session**: what you'd recommend working on first
 
 End with: "I'm awake. What should we work on first?"

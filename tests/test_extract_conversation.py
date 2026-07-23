@@ -53,6 +53,42 @@ class ExtractConversationTests(unittest.TestCase):
         self.assertNotIn("tool output", markdown)
         self.assertNotIn("private", markdown)
 
+    def test_claude_preserves_outbound_conductor_sends(self):
+        rendered = MODULE.render_session(ROOT / "tests/fixtures/claude-session.jsonl")
+        self.assertIsNotNone(rendered)
+        _, markdown = rendered
+
+        self.assertIn("## Agent → session `peer-session`", markdown)
+        self.assertIn("Fixture peer update: review is ready.", markdown)
+        self.assertIn("## Agent → operator", markdown)
+        self.assertIn("Fixture decision needed on rollout.", markdown)
+        self.assertIn("Options:\n- proceed\n- hold", markdown)
+        self.assertIn("## Agent → all sessions", markdown)
+        self.assertIn("Fixture fleet notice.", markdown)
+        # Sends keep their position between surrounding text blocks.
+        before = markdown.index("Text before the send.")
+        send = markdown.index("Fixture peer update: review is ready.")
+        after = markdown.index("Text after the send.")
+        self.assertLess(before, send)
+        self.assertLess(send, after)
+        # Ordinary tool calls and send receipts stay excluded.
+        self.assertNotIn("memory/MEMORY.md", markdown)
+        self.assertNotIn("queued", markdown)
+
+    def test_codex_preserves_conductor_sends_and_dedupes_call_ids(self):
+        rendered = MODULE.render_session(ROOT / "tests/fixtures/codex-session.jsonl")
+        self.assertIsNotNone(rendered)
+        _, markdown = rendered
+
+        self.assertIn("## Agent → session `peer-session`", markdown)
+        self.assertEqual(markdown.count("Fixture peer ping from codex."), 1)
+        self.assertIn("## Agent → operator", markdown)
+        self.assertIn("Fixture operator question from codex.", markdown)
+        self.assertIn("Options:\n- yes\n- no", markdown)
+        # Non-conductor MCP traffic stays excluded.
+        self.assertNotIn("unrelated lookup", markdown)
+        self.assertNotIn("search_docs", markdown)
+
     def test_atomic_write_replaces_existing_archive(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "conversation.md"

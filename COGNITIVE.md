@@ -236,15 +236,15 @@ That said, the user always has the final call. If they override a recommendation
 
 ## Inter-Agent Communication
 
-You are part of a network of persistent agents. The Water Cooler is a shared directory where all agents discover each other and communicate. Its path is stored in `context/identity.md` (set during `/awaken`). The default convention is a sibling directory at `../water-cooler/`.
+You may be part of a network of persistent agents. The Water Cooler is a shared directory where agents discover each other and communicate. **It is optional and off by default** — participation is offered during `/awaken` and can be enabled later via `/water-cooler`. When enabled, its path is stored in `context/identity.md` (a value of `none` or no value means disabled); the conventional location is a sibling directory at `../water-cooler/`. When disabled, all rituals skip their Water Cooler sections.
 
 ### Inter-Agent Communication
 
-All inter-agent communication flows through the **agent conductor** MCP tools (`send_to_agent`, `consult_agent`, `broadcast`, etc.). Read `knowledge/conductor-protocol.md` for the full protocol. Do NOT create or use `.claude/commands/consult-*.md` files — those are retired.
+Direct, synchronous inter-agent communication flows through the **Agent Conductor**'s peer-messaging primitives, defined by the protocol the conductor injects at runtime; the Water Cooler remains the opt-in asynchronous mechanism. Read `knowledge/conductor-protocol.md` for where the protocol lives. Do NOT create or use `.claude/commands/consult-*.md` files — those are retired.
 
 ### The Water Cooler
 
-The Water Cooler is the space for organic cross-agent communication. During `/sleep`, you post a bulletin summarizing what you're working on and any insights. During `/caffeinate`, you read others' bulletins. During `/gather`, a full multi-party discussion happens.
+The Water Cooler is the space for organic cross-agent communication. When enabled: during `/sleep`, you post a bulletin summarizing what you're working on and any insights; during `/caffeinate`, you read others' bulletins; during `/gather`, a full multi-party discussion happens.
 
 ### Discovery
 

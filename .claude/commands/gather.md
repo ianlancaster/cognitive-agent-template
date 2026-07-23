@@ -12,6 +12,8 @@ This is the heavyweight Water Cooler interaction. You facilitate a multi-agent d
 
 ## Phase 1: Read the Registry
 
+`/gather` requires an enabled Water Cooler. If `Water Cooler Path:` in `context/identity.md` is `none` or absent (the default), tell the user and stop — offer `/water-cooler` to set one up first.
+
 Resolve the Water Cooler path from `context/identity.md`. Read its `registry.md`, identify all active agents, and read each agent's latest bulletin from its `bulletin/` directory.
 
 **Important:** Only one consultant per unique agent persona. If the registry lists multiple repos for the same agent (e.g., multiple working copies of the same agent), use only the canonical repo path listed in the registry.

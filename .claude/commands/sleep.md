@@ -30,7 +30,7 @@ Update `context/current-state.md` so the banner reflects reality as of NOW (mode
 
 ## 5. Water Cooler — short
 
-Update your bulletin at the Water Cooler path from `context/identity.md` (`bulletin/{{codename}}.md`): Working On / one Recent Insight / open question if any. Commit+push the water-cooler repo.
+Skip if the Water Cooler is disabled (`Water Cooler Path:` is `none` or absent in `context/identity.md` — the default). Otherwise update your bulletin at that path (`bulletin/{{codename}}.md`): Working On / one Recent Insight / open question if any. Commit+push the water-cooler repo.
 
 ## 6. Archive + summary (subagent, never inline)
 
