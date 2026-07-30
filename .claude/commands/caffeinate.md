@@ -126,6 +126,7 @@ Infer the state of each ritual from artifacts you've already loaded. No extra fi
 - **Pending belief changes**: Check the digest's "Standing flags" (or `beliefs.md` if no digest) for entries flagged for the next meditation. If any exist and no meditation has run since, flag that meditation should arbitrate them.
 - **Unanswered peer questions**: If Water Cooler bulletins had questions directed at you and you haven't responded, note it.
 - **Template sync**: Read `.template-sync.json` if it exists. If `syncMode` is not `"off"` and `lastSyncDate` is more than 2 weeks ago, note it: "Template sync hasn't run in X days — sync runs at `/deep-sleep`." If `syncMode` is `"off"` or the file doesn't exist, don't mention it.
+- **Deferred template changes (do not skip):** if `.template-sync.json` has a non-empty `deferred` list, surface every entry whose status is `skipped`, with the commit it came from. **A matching `lastSyncedCommit` is not evidence that files match** — in one observed case the pointer read clean at template HEAD while four in-scope files and an entire command had never arrived, and because the pointer was at HEAD the gap was undetectable by sync thereafter. If `lastAuditDate` is absent or more than a month old, recommend `/sync` for its content audit regardless of what the pointer says.
 
 ## 8. Present the Ready-Up
 

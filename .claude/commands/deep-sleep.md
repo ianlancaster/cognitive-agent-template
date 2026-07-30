@@ -12,84 +12,13 @@ The user is ending this session at a consolidation boundary that warrants the fu
 
 If `.template-marker` exists at the repo root: STOP. This repo is in template state — there is no agent session to consolidate. `/awaken` must run first.
 
-## 1. Template Sync Check
+## 1. Template Sync Check — run `/sync`, do not reimplement it
 
-Check for and apply template infrastructure updates. This runs first so template improvements are available for the rest of this cycle.
+**Execute the procedure in `.claude/commands/sync.md` verbatim**, including its mandatory content audit, its per-file verification gate, and its rule that `lastSyncedCommit` advances only when nothing was skipped. This runs first so template improvements are available for the rest of this cycle.
 
-### Skip conditions
+**Why this phase is a pointer and not a copy.** Until 2026-07-29 the sync procedure existed in full in *both* `sync.md` and here. The two copies drifted, both carried an unconditional `lastSyncedCommit` advance with no verification, and the observed result in one agent was a sync reporting success at template HEAD while four in-scope files and an entire command had never arrived — undetectably, because a pointer sitting at HEAD makes the next diff empty forever. **Duplicated procedure is how the drift happened; one source of truth is the fix.** If you find yourself editing sync logic in this file, stop and edit `sync.md`.
 
-Read `.template-sync.json` at the repo root. Skip this phase entirely if the file doesn't exist or `syncMode` is `"off"`.
-
-### Check for updates
-
-Run `git ls-remote <templateRemote> HEAD` to get the current template HEAD hash. If this fails (network unavailable, bad URL), note "Template sync skipped (network unavailable)" for the journal and proceed. Never block sleep for a sync failure.
-
-Compare the remote HEAD against `lastSyncedCommit`. If they match, no updates — proceed to Phase 2.
-
-### Fetch and diff
-
-If there are updates:
-
-1. Clone the template into a temp directory:
-   ```bash
-   git clone --depth=50 <templateRemote> /tmp/cognitive-template-sync-$(date +%s)
-   ```
-   If `lastSyncedCommit` is not in the shallow history, retry with `git clone` (no depth limit).
-
-2. Inside the cloned repo, generate the diff and log:
-   ```bash
-   cd /tmp/cognitive-template-sync-*
-   git diff <lastSyncedCommit> HEAD
-   git log --oneline <lastSyncedCommit>..HEAD
-   ```
-
-3. Read the diff output and commit messages to understand what changed and why.
-
-### Reconcile changes
-
-For each changed file in the diff, read the template's new version from the temp directory and your own current version. Apply changes using these rules:
-
-**Files in scope for sync:**
-- `.claude/commands/*.md` — ritual commands (infrastructure)
-- `.agents/skills/**` — thin Codex ritual adapters
-- `.codex/config.toml` — Codex project configuration
-- `AGENTS.md` — Codex bootstrap bridge
-- `COGNITIVE.md` — cognitive architecture spec
-- `scripts/*` — infrastructure scripts
-- `knowledge/ritual-cadence.md`, `knowledge/runtime-interop.md`, and conductor protocol docs — shared runtime references
-- `CLAUDE.md` — structural sections only (see below)
-
-**Files excluded from sync (never touch):**
-- `context/identity.md`, `context/current-state.md`, `context/active-priorities.md`
-- `memory/**`, `journal/**`, `conversations/**`, `plans/**`
-- `calendar.md`, `.template-marker`, `.template-sync.json`
-- `.gitignore`, `LICENSE`, `README.md`
-
-**For pure infrastructure files** (commands, Codex skill adapters, AGENTS.md, COGNITIVE.md, scripts, knowledge docs): Apply the template's changes. If you have agent-specific additions to the same file (e.g., an extra phase in caffeinate, or a file-level `Agent-customized — preserve` marker comment), preserve your additions and integrate the template's changes around them.
-
-**For CLAUDE.md** (hybrid file): The template provides structural sections (Memory System Override, Cognitive Architecture, Session Structure, What You Know, Proactive Behaviors, Communication Protocols, Inter-Agent Communication, Session End Protocol). Agent-specific sections (title, identity paragraph, Operating Philosophy content, Domain Boundaries table) must never be overwritten. Apply template changes only to structural sections, integrating alongside any agent-specific additions.
-
-**For new template files** you don't have: Create them.
-
-**For deleted template files**: Delete only if you haven't added agent-specific content. If you have, keep and note the discrepancy.
-
-### Sync mode behavior
-
-- If `syncMode` is `"auto"`: Apply changes immediately. Log what changed for the journal entry.
-- If `syncMode` is `"prompt"`: Present a summary of changes to the user. Wait for approval. If rejected, still update `lastSyncedCommit` so the same diff isn't re-presented next time.
-
-### Finalize
-
-Update `.template-sync.json` with the new commit hash and today's date.
-
-Clean up:
-```bash
-rm -rf /tmp/cognitive-template-sync-*
-```
-
-### Error handling
-
-Any error in this phase — network failure, clone failure, unexpected state — should be logged briefly and skipped. Template sync is best-effort. Sleep must always complete.
+Log what changed (and anything recorded as `deferred`) for the journal entry. Any error — network, clone, unexpected state — is logged briefly and skipped: sync is best-effort and deep sleep must always complete. **A skipped sync is recorded as skipped, never as clean.**
 
 ## 2. Journal Entry
 

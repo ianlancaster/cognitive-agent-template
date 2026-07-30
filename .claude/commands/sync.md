@@ -15,10 +15,24 @@ Report the reason and stop.
 Run `git ls-remote <templateRemote> HEAD` to get the current template HEAD hash.
 
 Compare the remote HEAD against `lastSyncedCommit`:
-- If they match, report "Template is up to date." and stop.
+- If they match, **the pointer is not evidence — run the content audit below before reporting anything.**
 - If they differ, proceed to fetch and diff.
 
 If the network call fails, report the error and stop.
+
+### Content audit — mandatory when the pointer says "up to date"
+
+**A matching pointer means only that some past sync claimed success. It does not mean the files match.** This audit exists because that exact failure occurred: on 2026-07-28 `lastSyncedCommit` was advanced to template HEAD while four in-scope files were never updated and one command (`deep-sleep.md`) never arrived at all. Because the pointer sat at HEAD, `git diff <lastSyncedCommit> HEAD` was empty forever after and the mechanism could no longer detect its own gap. **Pointer-equality is self-concealing; only content comparison finds this.**
+
+Clone the template and compare **structure, not just existence**, for every in-scope file:
+
+```bash
+for f in .claude/commands/*.md COGNITIVE.md; do
+  echo "--- $f"; diff <(grep '^#' "$f") <(grep '^#' "$TEMPLATE/$f")
+done
+```
+
+Report any in-scope template file you do not have, and any heading present in the template and absent in yours. **A heading-level difference is a finding even when the pointer matches** — reconcile it as a normal sync, then record it. Only after the audit comes back clean may you report "Template is up to date."
 
 ## Fetch and diff
 
@@ -59,6 +73,8 @@ For each changed file in the diff, read the template's new version from the temp
 
 **For pure infrastructure files** (commands, Codex skill adapters and config, AGENTS.md, COGNITIVE.md, scripts, knowledge docs): Apply the template's changes. If you have agent-specific additions to the same file (e.g., an extra phase in caffeinate), preserve your additions and integrate the template's changes around them.
 
+**"Integrate around them" is the step that failed on 2026-07-28 and it is the one to be paranoid about.** A locally-customized file is the *most* likely to be skipped, because the diff looks conflicting and leaving it alone looks safe. It is not safe: it is how the file silently falls three months behind. When your version and the template's have both moved, you must reconcile section by section and record the result per file under the verification gate below — never file-level "mine is fine."
+
 **For CLAUDE.md** (hybrid file): The template provides structural sections (Memory System Override, Cognitive Architecture, Session Structure, What You Know, Proactive Behaviors, Communication Protocols, Inter-Agent Communication, Session End Protocol). Agent-specific sections (title, identity paragraph, Operating Philosophy content, Domain Boundaries table) must never be overwritten. Apply template changes only to structural sections.
 
 **For new template files** you don't have: Create them.
@@ -68,11 +84,43 @@ For each changed file in the diff, read the template's new version from the temp
 ## Sync mode behavior
 
 - If `syncMode` is `"auto"`: Apply changes immediately. Summarize what changed.
-- If `syncMode` is `"prompt"`: Present a summary of changes to the user. Wait for approval. If rejected, still update `lastSyncedCommit` so the same diff isn't re-presented.
+- If `syncMode` is `"prompt"`: Present a summary of changes to the user. Wait for approval. **If rejected, record the file under `deferred` (see Finalize) and do NOT advance `lastSyncedCommit` past it.** The previous version of this rule advanced the pointer on rejection "so the same diff isn't re-presented" — that is precisely how a change becomes permanently invisible. **A declined change must stay visible; re-presentation is the feature, not the bug.**
+
+## Verify before recording — the gate
+
+**Reconciliation here is model judgment, and model judgment silently skips files.** So no file may be recorded as synced until its result is checked at the artifact:
+
+For every in-scope file the diff touched, re-read **your own file after editing** and confirm each heading and each substantive block the template added is now present. Compare headings mechanically:
+
+```bash
+diff <(grep '^#' <yourfile>) <(grep '^#' <templatefile>)
+```
+
+Classify every touched file as exactly one of:
+
+- **applied** — template content verified present in your file.
+- **diverged-intentionally** — you are deliberately not taking it (e.g. a retired subsystem). **Requires a one-line reason recorded in `.template-sync.json`.** Silent divergence is indistinguishable from a bug.
+- **skipped** — not applied and not justified. **This is a failure, not an outcome.** Report it in the summary.
+
+**"I read the diff and judged my version fine" is not `applied`, it is `diverged-intentionally`, and it needs the reason written down.** That conflation is what produced the 2026-07-28 failure.
 
 ## Finalize
 
-Update `.template-sync.json` with the new commit hash and today's date.
+**Advance `lastSyncedCommit` to the new hash only if every touched in-scope file verified as `applied` or `diverged-intentionally`.** If any file is `skipped`, leave `lastSyncedCommit` where it is and list the skipped files under a `deferred` key — the pointer must never claim more than the content delivers.
+
+Write `.template-sync.json` as:
+
+```json
+{
+  "templateRemote": "...",
+  "lastSyncedCommit": "<advance only if nothing was skipped>",
+  "lastSyncDate": "<today>",
+  "lastAuditDate": "<today — set whenever the content audit ran>",
+  "deferred": [{ "file": "...", "sinceCommit": "...", "status": "skipped|diverged-intentionally", "reason": "..." }]
+}
+```
+
+**Surface any non-empty `deferred` list in `/caffeinate` ritual health**, every session, until it is empty or every entry is `diverged-intentionally` with a reason. An unresolved deferral that nobody reports is the same silent failure in a new place.
 
 Clean up:
 ```bash
