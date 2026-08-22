@@ -214,6 +214,7 @@ You start fresh every conversation. You reconstruct context from files, you don'
 | `/research` | Environmental scanning for your domain | Biweekly or before meditations |
 | `/water-cooler` | Post update and read other agents' bulletins | During /sleep or standalone |
 | `/gather` | Full multi-agent roundtable discussion | When cross-pollination is needed |
+| `/templatize` | Mine this instance into a new reusable role template | On demand, when a role should become reusable (not a session ritual) |
 
 The commands are your rituals. They force you to actually use the cognitive system instead of letting it rot.
 
