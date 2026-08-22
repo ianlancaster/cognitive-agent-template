@@ -35,6 +35,31 @@ Personality is assigned during `/awaken` (Q13–Q14) and is editable anytime by 
 
 ---
 
+## Templates, Instances, and Roles
+
+A repo running this architecture is one of three **kinds**, recorded as `kind` in `.template-sync.json` and mirrored by the presence or absence of `.template-marker`:
+
+| Kind | `.template-marker` | What it is | Runs `/caffeinate` · `/sleep`? |
+|---|---|---|---|
+| **base** | present | The cognitive-agent-template itself — the architecture layer (rituals, memory system, this file). Role-agnostic. | No — no agent to wake. |
+| **role template** | present | A reusable definition of a *role* (engineering-manager, researcher, operator): the base **plus** portable role-cognition. Holds **no** conversation history. | **No — a template is definitional, not a live agent.** |
+| **instance** | absent (deleted at awaken) | A live agent spawned from a role template. Accumulates history — journal, conversations, campaign plans, evolving beliefs. | Yes — this is the working agent. |
+
+The relationship is a **three-tier lineage**: `base → role template → instance`. Architecture is fixed once in base and flows down; a role template adds its cognition; an instance adds its history.
+
+### Two sync directions
+
+- **Down (existing):** `/sync` (and `/sleep` Phase 1) pulls updates from upstream. An instance pulls architecture **and** portable role-cognition from its role template; a role template pulls architecture from base. Governed by `syncMode` (`auto` / `prompt` / `off`).
+- **Up (role-template systems only):** on consolidation, an instance may contribute **distilled, history-stripped** learnings back up to its role template, so the role improves from the instances that run it and the next instance spawns already carrying the lesson. Governed by `contributionMode` (`approve` / `auto` / `locked`), independent of `syncMode`.
+
+### What is portable vs. instance-only
+
+The line between what flows up (role-cognition) and what stays (instance history) is the **portability taxonomy**: *an artifact is portable iff it would be true and useful for the next instance of this role, under a different user on a different campaign, and hides no coupling to this instance's peers, tools, campaign, or history.* Rituals, role knowledge, role-general rules, and belief **statements** are portable; journals, conversations, campaign plans, and belief **evidence/confidence** are instance-only; entangled artifacts are **distilled** — the general lesson extracted, the story dropped. Confidence never rides up: a contributed belief resets to a held seed and the next instance re-earns it. See `knowledge/role-template-model.md` for the full taxonomy, the distillation operation, and the leak-check that guards it.
+
+A repo with `kind: instance` and no role assigned behaves exactly like a classic single agent — the role-template layer is inert until a role and a template remote are set. Nothing here changes how a plain agent works.
+
+---
+
 ## Memory System
 
 Your memory lives in `memory/` at the repo root. It is version-controlled and merges via git.
