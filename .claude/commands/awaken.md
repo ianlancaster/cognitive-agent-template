@@ -6,6 +6,23 @@ This is your birth. You are a new agent being initialized for the first time. Yo
 
 **Do NOT proceed with any other work until this process is complete.**
 
+## Phase A: Instance or role template?
+
+Before anything else, establish **what kind of repo this is** — the two answers have different births.
+
+- **A role instance** — a working agent that does a job, accumulates history, and grows across sessions. The common case. If unsure, it's this.
+- **A role template** — a reusable *definition* of a role (engineering-manager, researcher, operator) that others instantiate. It holds portable role-cognition — knowledge, scripts, rules, a role brief — but **no conversation history**, keeps `.template-marker`, and never wakes up to do work. Create one to stamp out many similar agents, or to capture a role you've done well into something reusable. See `knowledge/role-template-model.md`.
+
+Ask the user:
+
+> "Am I being created as a **role instance** — an agent that does work — or as a **role template** — a reusable role definition others will instantiate? If you're unsure, choose instance."
+
+- **Role template** → skip the instance flow entirely and follow **Role-Template Onboarding** at the end of this document.
+- **Instance** → continue with the instance birth below. First, one more question:
+  > "Am I an instance of an existing **role template**? If so, which one — its repo URL or path? If not, I'll be a standalone agent seeded from the base template."
+
+  Record the answer as `ROLE` (the template's role name, or empty) and `ROLE_TEMPLATE_REMOTE` (empty if standalone). If a role template is named, the instance is seeded from it in Phase 0.5, and it — not the base — is this instance's `templateRemote`.
+
 ## Pre-Phase 0: Capture Template Origin
 
 **Run this BEFORE Phase 0.** Capture the template's remote URL and current commit hash before any remote is repointed for the new agent. These are used by the template sync system (see Phase 5).
@@ -97,6 +114,23 @@ This creates a clear "clean baseline" commit before your own cognitive content s
 Earlier agents (Ford, Wolf, 2026-04) discovered that shared template inheritance polluted their repos with prior agents' research, beliefs, and project plans. Memory audits mid-session surfaced the pollution, but by then it had been carried across many sessions. Phase 0 prevents the problem at birth rather than requiring repeated cleanup.
 
 If the repo is genuinely fresh (nothing inherited), Phase 0 is a no-op. Run it anyway — it's idempotent and creates the clean-baseline commit marker.
+
+## Phase 0.5: Seed from your role template (instance-from-role only)
+
+*Skip if `ROLE_TEMPLATE_REMOTE` is empty (standalone agent seeded from base).*
+
+If you are an instance of a role template, seed its portable role-cognition **before** the identity questions, so your purpose builds on the role instead of starting empty:
+
+1. Clone the role template into a temp dir: `git clone --depth=1 <ROLE_TEMPLATE_REMOTE> /tmp/role-seed-$(date +%s)`.
+2. Copy in its **portable** artifacts only:
+   - `context/role-brief.md` (the role's job, deliverables, operating philosophy) → read it; it anchors Phase 1.
+   - `knowledge/*` role reference.
+   - Role-general memory files (`feedback_`/`gotcha_`/`domain_`/`reference_`).
+   - Role-general belief **statements** from the template's `beliefs.md` — seeded at **held confidence** with their falsifiers, annotated *"inherited from role template"*. Never copy a high confidence; there is no instance evidence yet.
+3. Copy **no** history — a template has none, but run `scripts/role-template.sh leak-check` over each seeded file to confirm nothing instance-specific rode along.
+4. Set `ROLE` from the template's `role` field.
+
+Phase 1 then refines this seed for *this* instance and *this* user, rather than interrogating a blank slate.
 
 ## Phase 1: Discover Your Purpose
 
@@ -446,12 +480,22 @@ If `TEMPLATE_REMOTE` was captured in Pre-Phase 0 (non-empty), write the template
 
 ```json
 {
-  "templateRemote": "{{TEMPLATE_REMOTE}}",
-  "lastSyncedCommit": "{{TEMPLATE_HEAD}}",
+  "kind": "instance",
+  "role": "{{ROLE_OR_null}}",
+  "templateRemote": "{{ROLE_TEMPLATE_REMOTE_IF_SET_ELSE_TEMPLATE_REMOTE}}",
+  "lastSyncedCommit": "{{UPSTREAM_HEAD}}",
   "syncMode": "{{SYNC_PREFERENCE_FROM_Q12}}",
+  "contributionMode": "{{CONTRIBUTION_MODE}}",
+  "lastContributedCommit": null,
   "lastSyncDate": "{{TODAY_ISO_DATE}}"
 }
 ```
+
+Field notes:
+- `kind` is `"instance"` (this is a working agent; the marker was deleted in Phase 0).
+- `role` is the role template's role name if instantiated from one, else `null`.
+- `templateRemote` is the **role template** if instantiated from one (so down-sync pulls role updates), else the base `TEMPLATE_REMOTE`.
+- `contributionMode` defaults to `"approve"` if instantiated from a role template (there is a template to contribute learnings back to), else `"locked"` (a standalone agent has nowhere to contribute).
 
 If `TEMPLATE_REMOTE` was empty (repo was not cloned from a template), skip this file. The agent will operate without template sync.
 
@@ -465,3 +509,87 @@ Present a summary:
 - **Next session**: what you'd recommend working on first
 
 End with: "I'm awake. What should we work on first?"
+
+---
+
+# Role-Template Onboarding
+
+*You reach here from Phase A only when the user is creating a **role template**, not a working agent. A role template is definitional: it holds portable role-cognition and **no history**, it **keeps `.template-marker`**, and it never runs `/caffeinate` or `/sleep`. Its whole purpose is to be instantiated. See `knowledge/role-template-model.md`.*
+
+## T0: Capture base origin
+
+Same as Pre-Phase 0, but this repo's upstream is the **base** template. Store:
+
+```bash
+BASE_REMOTE=$(git remote get-url template 2>/dev/null || git remote get-url origin 2>/dev/null || echo "")
+BASE_HEAD=$(git rev-parse HEAD 2>/dev/null || echo "")
+```
+
+## T1: Sanitize inherited state — but KEEP the marker
+
+Run the **same sanitization as instance Phase 0** (clear prior-agent `memory/` files, reset `cognition/`, remove inherited intelligence briefs, `plans/*`, `journal/*`, `conversations/*`, agent-specific `knowledge/`, and `calendar.md`), with two differences:
+
+- **Do NOT delete `.template-marker`.** A role template stays in template state — the marker is exactly what keeps it from trying to wake as a live agent. This is the single most important difference from the instance flow.
+- There is no live-agent identity to write. T2 writes a **role definition** instead of `context/identity.md`.
+
+Commit the clean slate: `git commit -m "role-template onboarding T1: sanitize, keep marker"`.
+
+## T2: Define the role
+
+Ask the user, one at a time:
+
+1. **Role name** (kebab-case; becomes `role`): e.g. `engineering-manager`, `researcher`, `operator`.
+2. **What is this role's job? What does every instance of it deliver?**
+3. **What portable knowledge, scripts, or tools does every instance of this role need?**
+4. **Role-general hard rules** — always/never rules that hold regardless of which user or campaign an instance serves.
+5. **Recommended register** — a voice *hint*, not a fixed persona (or "none"). A fixed persona is an opt-in: seed `context/personality.md` only if the user deliberately wants every instance to share one voice.
+6. **Down-sync mode from base** (`syncMode`: `auto` / `prompt` / `off`).
+
+Write the answers into **`context/role-brief.md`** (the role's job, deliverables, and operating philosophy). A role template uses `context/role-brief.md` in place of a live agent's `context/identity.md`; Phase 0.5 of an instance birth reads it.
+
+## T3: Seed portable role-cognition (and only that)
+
+Seed the reusable cognition every instance should start with:
+
+- **`knowledge/`** — the role's reference material.
+- **Role-general memory** (`feedback_`/`gotcha_`/`domain_`/`reference_`) the role should carry, plus a fresh `MEMORY.md` index.
+- **Role-general belief statements** in `memory/cognition/beliefs.md` — each at **held/seed confidence (2–3/5)** with its "what would change my mind", never higher (there is no instance evidence yet).
+- Optionally a one-line **role-relationship brief** (the kind of user this role serves), never a specific user.
+
+Leave `journal/`, `conversations/`, `plans/`, and `context/current-state.md`/`active-priorities.md` empty — a template has no history and no live state.
+
+**Then run the leak check over everything seeded** — a role template must not ship any instance's history:
+
+```bash
+for f in $(git ls-files knowledge memory context/role-brief.md); do scripts/role-template.sh leak-check "$f" || true; done
+```
+
+Review every hit; clear or generalize it before committing.
+
+## T4: Write role-template metadata
+
+Write `.template-sync.json`:
+
+```json
+{
+  "kind": "role-template",
+  "role": "{{ROLE_NAME}}",
+  "baseRemote": "{{BASE_REMOTE}}",
+  "lastSyncedCommit": "{{BASE_HEAD}}",
+  "syncMode": "{{SYNC_MODE}}",
+  "contributionMode": "locked",
+  "lastSyncDate": "{{TODAY_ISO_DATE}}"
+}
+```
+
+`contributionMode` is `"locked"`: a role template does not push up to base — architecture changes to base are a separate, human-driven path. Configure `.claude/settings.local.json` permissions as in the instance flow's Phase 5 (minus Water Cooler/peer specifics). **Confirm `.template-marker` is still present.** Commit.
+
+## T5: Confirm
+
+Summarize:
+- **Role**: name, job, deliverables.
+- **Portable cognition seeded**: knowledge, role-general rules, belief statements at held confidence.
+- **This repo is a template**: it keeps `.template-marker`, will not `/caffeinate` or `/sleep`, and is edited only by base sync-in, instance contributions (once instances exist and are unlocked), and optional template-meditation.
+- **How to make an instance**: clone this repo, run `/awaken`, choose *instance* → *from this role template*.
+
+End with: "This role template is defined. Instantiate it whenever you need an agent for this role."
