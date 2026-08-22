@@ -112,6 +112,34 @@ When scouts return:
 3. Document what you applied — and anything you rejected, with reason — in the journal entry.
 4. If a significant structural change was made, note it explicitly so the next `/caffeinate` picks it up.
 
+## 5.5 Contribute distilled learnings up to your role template (role instances only)
+
+The **up**-direction of template sync, mirroring Phase 1's down-sync. Now that this cycle's cognition is consolidated and audited, offer its portable learnings back to your role template so the next instance inherits them without inheriting your history. Like Phase 1, this is heavy work that belongs here, never in fast `/sleep`. See `knowledge/role-template-model.md`.
+
+**Gate — run only if `scripts/role-template.sh should-contribute .template-sync.json` exits 0** (instance, role assigned, `templateRemote` set, `contributionMode` not `locked`) **and there are candidates.** If not, this phase is a **no-op** — report "no contribution (reason)" and move on. A zero-yield session must cost nothing.
+
+1. **Find candidates.** `scripts/role-template.sh candidates <lastContributedCommit>` lists portable-candidate files changed since your last contribution (role-general memory, belief statements, insight log, knowledge, non-base scripts). Instance-only files are never listed. No candidates → no-op.
+
+2. **Distill every candidate — no fast path.** For each, produce a portable artifact per `knowledge/role-template-model.md` and `knowledge/templatize-runbook.md`: extract the general lesson, strip the story, prefer act-shaped, reset belief confidence to a held seed. **Distill even the candidates that look already-clean** — the portable-vs-needs-distillation call is empirically unreliable (measured), so nothing is waved through on that judgment.
+
+3. **Leak-check every distilled artifact**, supplying your own proper nouns (peers, user, campaign, namespaces) as extra patterns:
+   ```bash
+   scripts/role-template.sh leak-check <distilled-file> <peer> <user> <campaign> ...
+   ```
+   Any hit blocks that artifact until cleared or generalized. **The leak check is the gate — not your clean/needs-distillation judgment.**
+
+4. **Apply per `contributionMode`:**
+   - **`approve`** — clone the role template, stage the distilled artifacts on a contribution branch, present the diff to the user, and push only on approval. A declined artifact is recorded, never silently dropped (re-presentation is the feature).
+   - **`auto`** — clone the role template, apply, and push. **Never overwrite:** if a distilled artifact conflicts with one already there (same rule/belief, different content), quarantine yours as a competing artifact attributed to this instance and flag it — auto adds and flags, it never resolves a conflict. A graduated belief matching one already present **increments its "converged across K instances" annotation** instead of duplicating it.
+
+5. **Record.** On success, set `lastContributedCommit` to your current HEAD:
+   ```bash
+   scripts/role-template.sh set .template-sync.json lastContributedCommit "$(git rev-parse HEAD)"
+   ```
+   Log what was contributed, what the leak check blocked, and what was declined.
+
+**Never contribute to base.** The upstream here is your role template (`templateRemote`), never the base — architecture changes to base are a separate, human-driven path.
+
 ## 6. Post to Water Cooler
 
 Skip if the Water Cooler is disabled (`Water Cooler Path:` is `none` or absent in `context/identity.md` — the default). Otherwise update your bulletin under that path, at `bulletin/{{codename}}.md`: Working On / Recent Insights / Questions for Others / Connections Spotted.

@@ -27,6 +27,7 @@ Update `context/current-state.md` so the banner reflects reality as of NOW (mode
 - Genuinely new insights → `memory/cognition/insight-log.md` (most sessions log 0-2; not every observation is an insight).
 - Belief evidence/confidence changes → do NOT edit the beliefs file during a fast sleep. Add a one-liner to the "Standing flags" section of `memory/cognition/beliefs-digest.md` (if no digest exists yet, flag inside `beliefs.md` under a "Pending arbitration" heading); `/meditate` arbitrates, with `/deep-sleep` doing the evidence prep.
 - New memory files ONLY for corrections the user made this session — corrections are banked the moment they happen, never deferred. Index anything new in `memory/MEMORY.md`.
+- **Role-template contribution flag (instances with a role):** if `.template-sync.json` has `contributionMode` other than `locked` and `scripts/role-template.sh candidates <lastContributedCommit>` lists anything, note in the Session Handoff that a distilled up-contribution is due at the next `/deep-sleep`. Fast sleep flags it; deep sleep runs it — same discipline as belief flags.
 
 ## 5. Water Cooler — short
 
@@ -49,4 +50,4 @@ Then the operator `SLEEP COMPLETE` signal (autonomous arcs only, ONLY after the 
 
 ## Explicitly NOT in standard sleep (deep-sleep territory)
 
-Template sync · memory-audit scouts (coherence/structure/index) · belief-file evidence appends and restructuring · ideation gardening · debugging/lessons-history entries (unless a major new failure class landed — then one entry) · preceding-conversation summary backfill · `MEMORY.md` reorganization. **Debt rule: after ~5 standard sleeps, before any `/meditate`, or at a major arc boundary, run `/deep-sleep` instead of `/sleep`.**
+Template sync (down) and role-template contribution (up) · memory-audit scouts (coherence/structure/index) · belief-file evidence appends and restructuring · ideation gardening · debugging/lessons-history entries (unless a major new failure class landed — then one entry) · preceding-conversation summary backfill · `MEMORY.md` reorganization. **Debt rule: after ~5 standard sleeps, before any `/meditate`, or at a major arc boundary, run `/deep-sleep` instead of `/sleep`.**
