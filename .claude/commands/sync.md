@@ -10,9 +10,27 @@ Read `.template-sync.json` at the repo root. Exit immediately if:
 
 Report the reason and stop.
 
+## Migrate legacy schema first
+
+Before checking for updates, ensure `.template-sync.json` carries the role-aware schema. If it has no `kind` field, it predates the role-template system — migrate it once:
+
+```bash
+scripts/role-template.sh migrate .template-sync.json
+```
+
+This is idempotent and conservative: it seeds `kind: "instance"`, `role: null`, and `contributionMode: "locked"` — **nothing is ever contributed upward until a role and mode are deliberately set** — and leaves every existing field untouched. Report the migration in your summary so it is visible, not silent.
+
+## Determine tier and upstream
+
+Read `kind` from `.template-sync.json` and resolve the upstream accordingly. Everywhere below that says `templateRemote`, use the upstream resolved here:
+
+- **`instance`** — upstream is `templateRemote` (its role template). Down-sync scope: architecture **and** portable role-cognition. *(Role-cognition down-sync into a live instance is added in Phase 4; until then the architecture scope below applies, and role-cognition is seeded only at instantiation.)*
+- **`role-template`** — upstream is `baseRemote` (the base template). Down-sync scope: **architecture only** — base must never overwrite the role's own cognition layer.
+- **`base`** — no upstream; `/sync` is a no-op. Report and stop.
+
 ## Check for updates
 
-Run `git ls-remote <templateRemote> HEAD` to get the current template HEAD hash.
+Run `git ls-remote <upstream> HEAD` to get the current upstream HEAD hash.
 
 Compare the remote HEAD against `lastSyncedCommit`:
 - If they match, **the pointer is not evidence — run the content audit below before reporting anything.**
