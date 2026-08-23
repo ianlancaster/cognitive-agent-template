@@ -59,8 +59,8 @@ These are prior-agent content that must not carry into the new agent's identity:
 # Clear agent-specific memory files (preserve cognition/ and intelligence/ directories themselves)
 find memory -maxdepth 1 -type f \( -name "user_*.md" -o -name "feedback_*.md" -o -name "domain_*.md" -o -name "gotcha_*.md" -o -name "reference_*.md" -o -name "project_*.md" -o -name "technical_*.md" -o -name "user-*.md" -o -name "project-*.md" \) -delete
 
-# Reset cognition files (Phase 3 will create fresh versions)
-rm -f memory/cognition/*.md
+# Reset cognition files (Phase 3 will create fresh versions; glob-free for zsh)
+find memory/cognition -maxdepth 1 -name "*.md" -delete 2>/dev/null || true
 
 # Remove inherited intelligence briefs (Phase 3 / /research will recreate)
 find memory/intelligence -maxdepth 1 -type f -name "*.md" ! -name "README.md" -delete
@@ -68,8 +68,9 @@ find memory/intelligence -maxdepth 1 -type f -name "*.md" ! -name "README.md" -d
 # Reset the memory index (Phase 3 recreates)
 rm -f memory/MEMORY.md
 
-# Remove inherited plans, journal, and conversations
-rm -rf plans/* journal/* conversations/* 2>/dev/null
+# Remove inherited plans, journal, and conversations (glob-free: zsh aborts on
+# an unmatched glob, and a fresh repo may not have these dirs at all)
+find plans journal conversations -mindepth 1 -delete 2>/dev/null || true
 
 # Remove agent-specific inherited knowledge while preserving template infrastructure
 find knowledge -mindepth 1 -maxdepth 1 \
@@ -78,6 +79,8 @@ find knowledge -mindepth 1 -maxdepth 1 \
   ! -name "conductor-protocol.md" \
   ! -name "conductor-scheduling.md" \
   ! -name "runtime-interop.md" \
+  ! -name "role-template-model.md" \
+  ! -name "templatize-runbook.md" \
   -exec rm -rf {} +
 
 # Reset calendar and context files (Phase 2 populates identity; current-state/active-priorities get seeded)
@@ -96,7 +99,7 @@ rm -f .template-marker
 - `COGNITIVE.md` (cognitive architecture specification)
 - `CLAUDE.md` (Phase 2 will overwrite with your identity — leaving it in place is fine)
 - `scripts/` (infrastructure)
-- Template knowledge files: `ritual-cadence.md`, `conductor-protocol.md`, `conductor-scheduling.md` if present, and `runtime-interop.md`
+- Template knowledge files: `ritual-cadence.md`, `conductor-protocol.md`, `conductor-scheduling.md` if present, `runtime-interop.md`, `role-template-model.md`, and `templatize-runbook.md`
 - `LICENSE`, `README.md`, `.gitignore`
 - `memory/intelligence/README.md` (template stub for the intelligence system)
 
