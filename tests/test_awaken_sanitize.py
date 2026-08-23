@@ -44,6 +44,12 @@ def tracked_knowledge_files():
 
 
 class SanitizePreservesInfrastructure(unittest.TestCase):
+    @unittest.skipUnless(
+        (ROOT / ".template-marker").exists(),
+        "instance repo (marker absent): birth already happened and instances "
+        "legitimately track non-infrastructure knowledge — the allowlist-vs-"
+        "tracked invariant holds only in template-state repos (base, role template)",
+    )
     def test_tracked_knowledge_survives_sanitize(self):
         cmd = knowledge_find_command(phase0_block(AWAKEN.read_text(encoding="utf-8")))
         with tempfile.TemporaryDirectory() as d:
