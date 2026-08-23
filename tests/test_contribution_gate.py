@@ -113,5 +113,19 @@ class CandidatesTests(unittest.TestCase):
             self.assertEqual(out, "", "a history-only session must yield no candidates")
 
 
+class AutoModeProse(unittest.TestCase):
+    """Auto-mode's landing path is prose executed by agents: it must stage on a
+    contribution branch and merge only after template-shipped gates pass —
+    auto adds clean content; it never bypasses a gate."""
+
+    def test_auto_stages_on_contribution_branch_behind_gates(self):
+        text = (ROOT / ".claude" / "commands" / "deep-sleep.md").read_text(encoding="utf-8")
+        auto = next(l for l in text.splitlines() if l.strip().startswith("- **`auto`**"))
+        self.assertIn("contribution branch", auto)
+        self.assertIn("never lands what a gate rejected", auto)
+        self.assertIn("quarantined contribution", auto)
+
+
 if __name__ == "__main__":
+
     unittest.main()
