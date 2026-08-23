@@ -26,7 +26,8 @@ Read `kind` from `.template-sync.json` and resolve the upstream accordingly. Eve
 
 - **`instance`** — upstream is `templateRemote` (its role template). Down-sync scope: architecture **and** portable role-cognition. *(Role-cognition down-sync into a live instance is added in Phase 4; until then the architecture scope below applies, and role-cognition is seeded only at instantiation.)*
 - **`role-template`** — upstream is `baseRemote` (the base template). Down-sync scope: **architecture only** — base must never overwrite the role's own cognition layer.
-- **`base`** — no upstream; `/sync` is a no-op. Report and stop.
+- **`base` with a `baseRemote`** — a *flavored base*: a fork that adds an opt-in capability layer on top of the root base and from which role templates may derive. Upstream is `baseRemote`; down-sync scope is **architecture only**, reconciled with the "integrate around local additions" rule — the flavor's own additions are the point of the fork and must survive every sync.
+- **`base` with no `baseRemote`** — the root; `/sync` is a no-op. Report and stop.
 
 ## Check for updates
 

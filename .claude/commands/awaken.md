@@ -485,7 +485,7 @@ If `TEMPLATE_REMOTE` was captured in Pre-Phase 0 (non-empty), write the template
   "templateRemote": "{{ROLE_TEMPLATE_REMOTE_IF_SET_ELSE_TEMPLATE_REMOTE}}",
   "lastSyncedCommit": "{{UPSTREAM_HEAD}}",
   "syncMode": "{{SYNC_PREFERENCE_FROM_Q12}}",
-  "contributionMode": "{{CONTRIBUTION_MODE}}",
+  "contributionMode": { "cognitive-knowledge": "auto", "cognitive-authority": "approve" },
   "lastContributedCommit": null,
   "lastSyncDate": "{{TODAY_ISO_DATE}}"
 }
@@ -495,7 +495,7 @@ Field notes:
 - `kind` is `"instance"` (this is a working agent; the marker was deleted in Phase 0).
 - `role` is the role template's role name if instantiated from one, else `null`.
 - `templateRemote` is the **role template** if instantiated from one (so down-sync pulls role updates), else the base `TEMPLATE_REMOTE`.
-- `contributionMode` defaults to `"approve"` if instantiated from a role template (there is a template to contribute learnings back to), else `"locked"` (a standalone agent has nowhere to contribute).
+- `contributionMode` is **per contribution class**. `*-knowledge` classes (distilled memories, insights, knowledge docs) default `auto`; `*-authority` classes (behavior-changing rules, belief statements, executable scripts) default `approve` and **can never be `auto`** — `set-mode` rejects it and lookup clamps it. For a standalone agent with no role template, set every class to `"locked"` (nowhere to contribute). A flavored base or role template may add further classes (same naming convention carries the authority floor).
 
 If `TEMPLATE_REMOTE` was empty (repo was not cloned from a template), skip this file. The agent will operate without template sync.
 
