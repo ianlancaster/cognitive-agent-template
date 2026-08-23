@@ -132,6 +132,7 @@ If you are an instance of a role template, seed its portable role-cognition **be
    - Role-general belief **statements** from the template's `beliefs.md` — seeded at **held confidence** with their falsifiers, annotated *"inherited from role template"*. Never copy a high confidence; there is no instance evidence yet.
 3. Copy **no** history — a template has none, but run `scripts/role-template.sh leak-check` over each seeded file to confirm nothing instance-specific rode along.
 4. Set `ROLE` from the template's `role` field.
+5. **Commit the seed** (`git commit -m "awaken Phase 0.5: seed from role template"`) — Phase 5's `lastContributedCommit` records this commit as the birth baseline, so contributions are exactly what this instance learns after it.
 
 Phase 1 then refines this seed for *this* instance and *this* user, rather than interrogating a blank slate.
 
