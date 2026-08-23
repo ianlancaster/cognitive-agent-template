@@ -489,13 +489,14 @@ If `TEMPLATE_REMOTE` was captured in Pre-Phase 0 (non-empty), write the template
   "lastSyncedCommit": "{{UPSTREAM_HEAD}}",
   "syncMode": "{{SYNC_PREFERENCE_FROM_Q12}}",
   "contributionMode": { "cognitive-knowledge": "auto", "cognitive-authority": "approve" },
-  "lastContributedCommit": null,
+  "lastContributedCommit": "{{HEAD_AFTER_THE_PHASE_0_5_SEED_COMMIT}}",
   "lastSyncDate": "{{TODAY_ISO_DATE}}"
 }
 ```
 
 Field notes:
 - `kind` is `"instance"` (this is a working agent; the marker was deleted in Phase 0).
+- `lastContributedCommit` starts at the birth commit (HEAD once the Phase 0.5 seed is committed), **not** `null`: contributions are what this instance learned *since birth*, and a `null` here would make the first consolidation re-offer the entire inherited corpus to distillation. (`null` remains correct for *migrated* legacy agents, whose contribution gate starts `locked` anyway.)
 - `role` is the role template's role name if instantiated from one, else `null`.
 - `templateRemote` is the **role template** if instantiated from one (so down-sync pulls role updates), else the base `TEMPLATE_REMOTE`.
 - `contributionMode` is **per contribution class**. `*-knowledge` classes (distilled memories, insights, knowledge docs) default `auto`; `*-authority` classes (behavior-changing rules, belief statements, executable scripts) default `approve` and **can never be `auto`** — `set-mode` rejects it and lookup clamps it. For a standalone agent with no role template, set every class to `"locked"` (nowhere to contribute). A flavored base or role template may add further classes (same naming convention carries the authority floor).

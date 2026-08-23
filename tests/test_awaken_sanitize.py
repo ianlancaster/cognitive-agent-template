@@ -79,18 +79,16 @@ class SanitizePreservesInfrastructure(unittest.TestCase):
     weaker: everything the allowlist names survives, planted junk does not.
     In an INSTANCE birth already happened — no invariant to check."""
 
-    def setUp(self):
-        self.kind = repo_kind()
-        if self.kind == "instance":
+    def test_sanitize_preserves_infrastructure(self):
+        kind = repo_kind()
+        if kind == "instance":
             self.skipTest("instance repo: sanitize ran at birth; instances "
                           "legitimately track non-infrastructure knowledge")
-        self.cmd = knowledge_find_command(phase0_block(AWAKEN.read_text(encoding="utf-8")))
-
-    def test_sanitize_preserves_infrastructure(self):
-        survivors = run_sanitize_fixture(self.cmd)
+        cmd = knowledge_find_command(phase0_block(AWAKEN.read_text(encoding="utf-8")))
+        survivors = run_sanitize_fixture(cmd)
         self.assertNotIn("research-notes.md", survivors)
         self.assertNotIn("campaign-x", survivors)
-        if self.kind == "base":
+        if kind == "base":
             self.assertEqual(
                 survivors,
                 tracked_knowledge_files(),
@@ -99,7 +97,7 @@ class SanitizePreservesInfrastructure(unittest.TestCase):
                 "must survive birth; everything else must be cleared.",
             )
         else:  # role-template (or flavored base): allowlist ⊆ survivors ⊆ tracked
-            listed = allowlist_names(self.cmd) & tracked_knowledge_files()
+            listed = allowlist_names(cmd) & tracked_knowledge_files()
             self.assertTrue(
                 listed <= survivors,
                 f"allowlist-named infrastructure deleted by sanitize: {listed - survivors}",
