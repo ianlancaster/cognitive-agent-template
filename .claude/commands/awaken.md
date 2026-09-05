@@ -61,6 +61,8 @@ find knowledge -mindepth 1 -maxdepth 1 \
   ! -name "conductor-protocol.md" \
   ! -name "conductor-scheduling.md" \
   ! -name "runtime-interop.md" \
+  ! -name "current-state-contract.md" \
+  ! -name "durability.md" \
   -exec rm -rf {} +
 
 # Reset calendar and context files (Phase 2 populates identity; current-state/active-priorities get seeded)
@@ -79,7 +81,7 @@ rm -f .template-marker
 - `COGNITIVE.md` (cognitive architecture specification)
 - `CLAUDE.md` (Phase 2 will overwrite with your identity — leaving it in place is fine)
 - `scripts/` (infrastructure)
-- Template knowledge files: `ritual-cadence.md`, `conductor-protocol.md`, `conductor-scheduling.md` if present, and `runtime-interop.md`
+- Template knowledge files: `ritual-cadence.md`, `conductor-protocol.md`, `conductor-scheduling.md` if present, `runtime-interop.md`, `current-state-contract.md`, and `durability.md`
 - `LICENSE`, `README.md`, `.gitignore`
 - `memory/intelligence/README.md` (template stub for the intelligence system)
 
