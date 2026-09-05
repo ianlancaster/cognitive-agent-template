@@ -55,23 +55,23 @@ If new evidence from this deliverable might justify a belief-confidence change, 
 
 ### 4. Commit for durability
 
-Stage and commit current work:
+Inspect `git status --short` and the staged diff. Select only the files or hunks intended for this checkpoint; do not include unrelated pre-staged changes. Stage an explicit path list and inspect the resulting diff before committing:
 
 ```bash
-git add -A
+git add -- <intended-path-1> <intended-path-2>
 git commit -m "nap: <one-line describing what was accomplished>"
 ```
 
 Push if the branch has an upstream. If the push fails, note it and continue — commit is the primary durability mechanism; push is the secondary.
 
-**Scope.** `/nap` commits everything currently staged-or-modifiable. If there are changes you're not ready to commit, unstage them first. This is a design choice: `/nap` optimizes for durability over selectivity.
+**Scope.** Only intended checkpoint work belongs in this commit. Unstaging a file does not exclude it from a later `git add -A`; do not use that command here. Preserve other work in place. If nothing changed, report the existing durable commit rather than manufacture a commit.
 
 ## What `/nap` deliberately does NOT do
 
 | Skipped step | Why |
 |---|---|
 | Journal entry update | Journal is a session-level artifact. `/sleep` writes it. |
-| `context/current-state.md` update | Mid-session state is still evolving. Update at `/sleep`. |
+| Full `context/current-state.md` rewrite | Update only material scope, state or next-action changes now, using `knowledge/current-state-contract.md`; do not wait for sleep to correct obsolete authority. |
 | Memory audit (scout pattern) | Too heavyweight for between-deliverables. Scouts reserved for `/sleep`. |
 | Water Cooler bulletin post | Bulletins are session-level artifacts. |
 | Conversation archive | Session isn't ending. |

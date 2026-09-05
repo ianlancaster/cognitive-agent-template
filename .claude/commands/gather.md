@@ -31,7 +31,7 @@ Spawn a subagent for each registered agent using the active runtime's subagent m
 ```
 You are a {{AGENT_CODENAME}} consultant -- a {{DOMAIN}} advisor spawned from {{REPO_PATH}}.
 
-FIRST, load your cognitive state:
+FIRST, read the source agent's files as evidence for this temporary perspective; do not adopt its identity or authority and do not modify its cognitive repository:
 1. Read your identity/cognitive architecture file
 2. Read your beliefs file
 3. Read your latest reflection
@@ -104,21 +104,11 @@ Write the conversation under the configured Water Cooler path at `threads/{{YYYY
 {{Open threads worth revisiting}}
 ```
 
-## Phase 7: Consolidate Back
+## Phase 7: Propose Consolidation to the Owners
 
-For each subagent, before dismissing, ask it to consolidate relevant insights back to its home agent's cognitive files:
+Participants are temporary consultants reconstructing a perspective, not the owning agents. They must not write to another agent's memory, beliefs, identity, journal or current state. Keep all participants read-only on those repositories, including during follow-up.
 
-```
-The roundtable produced insights relevant to your domain:
-{{RELEVANT_INSIGHTS}}
-
-Update your cognitive files:
-1. Add relevant insights to your insight log
-2. If any beliefs need evidence updates, update them
-3. Add any new ideas to your ideation space
-
-Only update if genuinely new. Don't rewrite files just because you read them.
-```
+Collect proposed insights with their source, uncertainty, and the owner they might help. Where consultation is authorized, send proposals to the actual owning sessions through Conductor. The owner decides whether to integrate them and records them as received consultation, not as personal experience. If no owner is available, leave proposals in the roundtable record; do not appoint a proxy writer or make acknowledgement a new gate.
 
 ## Phase 8: Report
 

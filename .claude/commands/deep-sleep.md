@@ -6,7 +6,7 @@ The user is ending this session at a consolidation boundary that warrants the fu
 
 **When to run this instead of `/sleep`:** after ~5 standard sleeps · immediately before or after a `/meditate` · at a major arc boundary (project phase completed, priorities rewritten) · when the fast sleeps have visibly accumulated debt (stale summaries, unarbitrated belief flags, index drift).
 
-**Operator signaling (autonomous arcs only):** same protocol as `/sleep` — `ENTERING SLEEP` now, `SLEEP COMPLETE` only after the final push succeeds; skip both in interactive sessions.
+**Operator signaling (autonomous arcs only):** same protocol as `/sleep` — `ENTERING SLEEP` now, `SLEEP COMPLETE` only after the durability disposition below is complete; skip both in interactive sessions.
 
 ## Pre-flight: Template-State Guard
 
@@ -28,6 +28,8 @@ Create or update `journal/{{YYYY-MM-DD}}.md` with detailed notes: what was discu
 
 Update `context/current-state.md` — same discipline as the fast sleep: REPLACE, never append; superseded content moves to `context/archive/current-state-archive.md`; the live file stays ≤ ~150 lines. Update `context/active-priorities.md` with current focus and sequencing; archive stale queues.
 
+Follow `knowledge/current-state-contract.md` for current authority, state ownership and byte-bounded restoration; do not reconstruct authority from file recency.
+
 ## 4. Update Cognitive Files
 
 This is the phase the fast `/sleep` deliberately skips — the belief file is edited HERE, with evidence shown.
@@ -45,7 +47,7 @@ This is the phase the fast `/sleep` deliberately skips — the belief file is ed
 - Add new seedlings, promote seedlings that gained clarity, add predictions with dates, prune dead seedlings.
 
 ### Reflection (`memory/cognition/reflection-latest.md`)
-- Full replacement using the What? / So What? / Now What? framework, with confidence/bias/watching, a **Recommended next ritual** line, and the binding **Session Handoff** section (operating mode · read-before-anything list · behavioral corrections as rules · operational rhythm). Identical contract to the fast sleep — this artifact is never skipped or thinned.
+- Full replacement using the What? / So What? / Now What? framework, with confidence/bias/watching, a **Recommended next ritual** line, and the source-linked **Session Handoff** section (operating mode · read-before-anything list · behavioral corrections as rules · operational rhythm). Identical contract to the fast sleep — this artifact is never skipped or thinned.
 
 ## 5. Memory Audit
 
@@ -124,20 +126,11 @@ Dispatch ONE cheap subagent to summarize this session's transcript to `conversat
 
 ## 8. Commit and Push
 
-```bash
-git add -A -- memory/ conversations/ journal/ context/ calendar.md plans/ knowledge/ .claude/commands/ .agents/skills/ .codex/config.toml CLAUDE.md AGENTS.md COGNITIVE.md scripts/
-[ ! -f .template-sync.json ] || git add .template-sync.json
-git commit -m "deep-sleep: consolidation for YYYY-MM-DD"
-git push
-```
+Follow `knowledge/durability.md`: inspect changes, stage only intended paths, commit if needed, and state local-commit and backup status separately. Do not include unrelated staged work. No configured backup is a disclosed condition, not an automatic request to create a remote.
 
-If the Water Cooler is enabled, also commit the bulletin update (path from `context/identity.md`):
-```bash
-WC_PATH="$(grep 'Water Cooler Path:' context/identity.md | sed 's/.*: //' | tr -d '`' | xargs)"
-[ -n "$WC_PATH" ] && [ "$WC_PATH" != "none" ] && cd "$WC_PATH" && git add bulletin/ && git commit -m "bulletin: {{codename}} update YYYY-MM-DD" && git push
-```
+If the Water Cooler is enabled, use the same durability contract for its bulletin update in that separate repository. Never substitute its status for this agent repository's status.
 
-Then the operator `SLEEP COMPLETE` signal (autonomous arcs only, ONLY after the push succeeds).
+Then the operator `SLEEP COMPLETE` signal (autonomous arcs only, with the durability disposition stated).
 
 ## 9. Confirm Next Actions
 

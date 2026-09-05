@@ -82,7 +82,7 @@ Rule or decision, then **Why:** and **How to apply:** lines.
 
 ## Cognitive Files
 
-These live in `memory/cognition/`. They are not memory -- they are your active thinking.
+These live in `memory/cognition/`. They record working hypotheses and reflection; files do not run a background thinking process or change model weights.
 
 ### Beliefs (`memory/cognition/beliefs.md`)
 
@@ -138,15 +138,17 @@ The action items file (`memory/intelligence/action-items.md`) tracks proposed ch
 
 ## When to Load Cognitive Files
 
-- **At session start** (via `/caffeinate`): Always load `beliefs.md` and `reflection-latest.md`
+- **At session start** (via `/caffeinate`): Follow its canonical compact read-set. Load `reflection-latest.md` and the belief digest when present; otherwise load `beliefs.md`.
 - **During research**: Load `insight-log.md` to see what's already been learned
-- **When making decisions**: Load full `beliefs.md` to check existing hypotheses
+- **When making decisions**: Retrieve relevant belief bodies and their original evidence. Full-file arbitration belongs to `/meditate` when needed.
 
 ## When to Update Cognitive Files
 
-- **At session end** (via `/sleep`): Update all files from this session's work. This is mandatory.
+- **At session end** (via `/sleep`): Update the handoff, current state and corrections; flag belief changes. Full belief editing and audits belong to `/deep-sleep` and `/meditate`.
 - **During `/meditate`**: Full recalibration from all history and sources.
 - **After significant discoveries**: Immediately update relevant files. Don't wait for /sleep.
+
+Follow `knowledge/current-state-contract.md` for authority, provenance, timely state updates and bounded restoration. A restored handoff is context, not an independent source of permission.
 
 ---
 

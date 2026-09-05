@@ -4,7 +4,7 @@ A template for creating persistent AI agent personas that can move between [Clau
 
 ## What This Is
 
-Most AI assistants start fresh every conversation. This template gives Claude Code and Codex agents **persistent consciousness** -- they learn, grow, and remember across sessions through one shared, file-based cognitive system.
+Most AI assistants start fresh every conversation. This template gives Claude Code and Codex agents **persistent, inspectable context** through one shared, file-based cognitive system. Sessions reconstruct knowledge from these records; the template does not establish consciousness, change model weights, or guarantee that a stored lesson is retrieved or applied correctly.
 
 Every agent spawned from this template gets:
 
@@ -14,8 +14,12 @@ Every agent spawned from this template gets:
 - **Session rituals** (`/caffeinate` in Claude Code or `$caffeinate` in Codex, with matching sleep and meditation rituals)
 - **First-run onboarding** (`/awaken` or `$awaken`) that asks questions and builds the agent's identity
 - **Multi-agent communication** via an optional shared Water Cooler protocol (off by default)
-- **Synaptic pruning** that detects contradictions and optimizes cognitive files each session
-- **Conversation archiving** for full session history
+- **Consolidation procedures** for reviewing contradictions and keeping the working set useful
+- **Conversation reading views** with source references and turn timestamps; original records remain necessary for lossless evidence and sender attribution
+
+Current authority and bounded restoration follow [the current-state contract](knowledge/current-state-contract.md). Checkpoints distinguish local commits from successful backups using [the durability contract](knowledge/durability.md). Template sync audits full content and source-bound intentional divergence; it does not infer completeness from headings or a matching revision pointer.
+
+Run the database-free regression checks with `python3 -B -m unittest discover -s tests -v`.
 
 ## Quick Start
 

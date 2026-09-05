@@ -58,7 +58,9 @@ If Codex lacks write access during a ritual, request narrowly scoped access for 
 
 ## Conversation Archives
 
-Run `./scripts/extract-conversation.sh`. It detects Claude Code and Codex transcripts, strips tool traffic and host instructions, and writes normalized user/agent dialogue to `conversations/`.
+Run `./scripts/extract-conversation.sh`. It detects Claude Code and Codex transcripts, omits most tool traffic and enumerated host wrappers, and writes a normalized reading view with source references and per-turn provenance to `conversations/`.
+
+This reading view is not a lossless authority archive. User-role transport does not prove human authorship; incoming sender labels are claims until joined to Conductor receipts. Session filenames use session-start time, not every turn's date. Original transcript paths and hashes support targeted verification; preserve needed raw evidence separately before deleting its source, using an appropriate private store rather than blindly committing tool output or secrets.
 
 Optional forms:
 

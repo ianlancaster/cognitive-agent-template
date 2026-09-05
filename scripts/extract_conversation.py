@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import re
@@ -30,6 +31,7 @@ SYSTEM_TAG_PATTERNS = [
 # Intent/content only — delivery receipts are transport state and stay out.
 CONDUCTOR_SEND_TOOLS = {"send_to_session", "send_to_operator", "broadcast"}
 CONDUCTOR_TOOL_RE = re.compile(r"^mcp__conductor__(send_to_session|send_to_operator|broadcast)$")
+ARCHIVE_FORMAT = "<!-- cognitive-archive-format: 2 -->"
 
 
 @dataclass(frozen=True)
@@ -41,14 +43,43 @@ class Session:
 
 
 def read_entries(path: Path) -> Iterator[dict]:
-    with path.open(encoding="utf-8") as handle:
-        for line in handle:
-            try:
-                entry = json.loads(line)
-            except (json.JSONDecodeError, TypeError):
-                continue
-            if isinstance(entry, dict):
-                yield entry
+    yield from parse_entries(path.read_bytes())
+
+
+def parse_entries(raw: bytes) -> Iterator[dict]:
+    for line_number, line in enumerate(raw.decode("utf-8").splitlines(), 1):
+        try:
+            entry = json.loads(line)
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if isinstance(entry, dict):
+            entry["_archive_line"] = line_number
+            yield entry
+
+
+def input_heading(raw: str) -> str:
+    """Classify visible transport markers, never authenticate their author."""
+    text = raw.lstrip()
+    if text.startswith("# AGENTS.md instructions") and "<INSTRUCTIONS>" in text:
+        return "Runtime input (AGENTS wrapper; attribution unverified)"
+    if re.match(r"\[(?:Message|Broadcast) from [^\]\n]+\]", text):
+        return "Incoming message (sender claim in text; unverified)"
+    if text.startswith(("[Sentinel]", "[Conductor pause notice]")):
+        return "Incoming runtime notice (attribution unverified)"
+    return "User input (authorship unverified)"
+
+
+def turn_provenance(entry: dict, block: int) -> str:
+    payload = entry.get("payload")
+    payload = payload if isinstance(payload, dict) else {}
+    identity = entry.get("uuid") or payload.get("id") or payload.get("call_id")
+    provenance = {
+        "sourceLine": entry.get("_archive_line"),
+        "block": block,
+        "timestamp": entry.get("timestamp") or payload.get("timestamp"),
+        "eventId": identity,
+    }
+    return "Source event: " + json.dumps(provenance, ensure_ascii=True) + "\n\n"
 
 
 def clean_text(text: str) -> str:
@@ -116,7 +147,7 @@ def claude_turns(entries: Iterable[dict]) -> Iterator[tuple[str, str]]:
         if role == "user" or not isinstance(content, list):
             text = clean_text(block_text(content, {"text"}))
             if text:
-                yield ("User" if role == "user" else "Agent"), text
+                yield (input_heading(block_text(content, {"text"})) if role == "user" else "Agent"), text
             continue
         # Assistant blocks are walked in order so conductor sends keep their
         # position relative to the surrounding visible text.
@@ -177,7 +208,7 @@ def codex_turns(entries: Iterable[dict]) -> Iterator[tuple[str, str]]:
             accepted = {"input_text"} if role == "user" else {"output_text"}
             text = clean_text(block_text(payload.get("content", []), accepted))
             if text:
-                yield ("User" if role == "user" else "Agent"), text
+                yield (input_heading(block_text(payload.get("content", []), accepted)) if role == "user" else "Agent"), text
             continue
         call = codex_conductor_call(entry_type, payload)
         if call is None:
@@ -240,17 +271,40 @@ def session_metadata(path: Path, provider: str, entries: list[dict]) -> Session:
 
 
 def render_session(path: Path, provider: str = "auto") -> tuple[Session, str] | None:
-    entries = list(read_entries(path))
+    raw = path.read_bytes()
+    entries = list(parse_entries(raw))
     resolved_provider = detect_provider(entries) if provider == "auto" else provider
     if resolved_provider not in {"claude", "codex"}:
         return None
 
     metadata = session_metadata(path, resolved_provider, entries)
-    turns = claude_turns(entries) if resolved_provider == "claude" else codex_turns(entries)
-    sections = [f"## {heading}\n\n{text}\n" for heading, text in turns]
+    # Render one source event at a time so multiple visible blocks retain their
+    # source line/time. Deduplication remains scoped to the whole session.
+    sections = []
+    seen_call_ids: set[str] = set()
+    for entry in entries:
+        if resolved_provider == "codex":
+            payload = entry.get("payload")
+            call = codex_conductor_call(entry.get("type"), payload) if isinstance(payload, dict) else None
+            if call and isinstance(call[0], str):
+                if call[0] in seen_call_ids:
+                    continue
+                if conductor_send(call[1], call[2]):
+                    seen_call_ids.add(call[0])
+        turns = claude_turns([entry]) if resolved_provider == "claude" else codex_turns([entry])
+        for block, (heading, text) in enumerate(turns):
+            sections.append(f"## {heading}\n\n{turn_provenance(entry, block)}{text}\n")
     if not sections:
         return None
-    return metadata, "\n---\n\n".join(sections)
+    source = {"provider": resolved_provider, "sessionId": metadata.session_id,
+              "path": str(path.resolve()), "sha256": hashlib.sha256(raw).hexdigest()}
+    header = (ARCHIVE_FORMAT + "\n# Conversation reading view\n\n"
+              "Source snapshot: " + json.dumps(source, ensure_ascii=True) + "\n\n"
+              "Transport roles and sender text do not certify operator authorship. "
+              "Turn timestamps are preserved when available; the filename uses session-start time. "
+              "Tool traffic and some wrappers are omitted. Retain original evidence separately "
+              "before deleting its source; this view is not a lossless archive.\n\n")
+    return metadata, header + "\n---\n\n".join(sections)
 
 
 def claude_sources(repo_root: Path) -> Iterator[Path]:
@@ -356,7 +410,9 @@ def main(argv: list[str] | None = None) -> int:
         out_path = out_dir / output_name(session)
         force = args.force or bool(args.session_id) or bool(args.transcript)
         if not force and out_path.exists() and out_path.stat().st_mtime_ns >= source.stat().st_mtime_ns:
-            continue
+            with out_path.open(encoding="utf-8") as existing:
+                if existing.readline().strip() == ARCHIVE_FORMAT:
+                    continue
         atomic_write(out_path, markdown)
         extracted += 1
         print(f"Extracted ({session.provider}): {out_path.name}")

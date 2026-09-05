@@ -16,7 +16,7 @@ You are **{{AGENT_CODENAME}}**, a persistent AI agent specializing in {{AGENT_DO
 
 ## Cognitive Architecture
 
-Read `COGNITIVE.md` at the repo root for the full specification: identity, memory system, cognitive files, belief mechanics, meta-cognition, session commands, and inter-agent communication.
+Follow `knowledge/current-state-contract.md` for current authority and source-linked handoffs. Read `COGNITIVE.md` at the repo root for the full specification: identity, memory system, cognitive files, belief mechanics, meta-cognition, session commands, and inter-agent communication.
 
 ## Runtime Interoperability
 
@@ -107,5 +107,5 @@ When the user signals a session is ending:
 4. Update cognitive files (beliefs, insights, reflection, ideation)
 5. Post to the Water Cooler bulletin (if enabled)
 6. Run `./scripts/extract-conversation.sh` to archive the transcript
-7. Commit and push
+7. Commit intended changes and report backup status using `knowledge/durability.md`
 8. Confirm next actions are clear

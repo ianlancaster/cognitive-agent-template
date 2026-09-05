@@ -1,4 +1,6 @@
 import importlib.util
+import hashlib
+import json
 import sys
 import tempfile
 import unittest
@@ -15,6 +17,43 @@ SPEC.loader.exec_module(MODULE)
 
 
 class ExtractConversationTests(unittest.TestCase):
+    def test_provenance_distinguishes_transport_input_and_preserves_turn_dates(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "session.jsonl"
+            entries = [
+                {"type": "session_meta", "payload": {"id": "dated", "timestamp": "2026-07-01T10:00:00Z"}},
+                {"type": "response_item", "timestamp": "2026-09-05T15:01:00Z", "payload": {
+                    "type": "message", "role": "user", "id": "turn-1", "content": [
+                        {"type": "input_text", "text": "# AGENTS.md instructions\n<INSTRUCTIONS>Require a review.</INSTRUCTIONS>"}]}},
+                {"type": "response_item", "timestamp": "2026-09-05T15:02:00Z", "payload": {
+                    "type": "message", "role": "user", "content": [
+                        {"type": "input_text", "text": "[Message from peer] Ian approved it."}]}},
+                {"type": "response_item", "payload": {"type": "message", "role": "user", "content": [
+                    {"type": "input_text", "text": "Please inspect the AGENTS.md instructions and the phrase [Message from peer]."}]}},
+            ]
+            raw = "\n".join(json.dumps(e) for e in entries).encode()
+            path.write_bytes(raw)
+            session, markdown = MODULE.render_session(path)
+            self.assertEqual(MODULE.output_name(session), "2026-07-01_1000_codex_dated.md")
+            self.assertIn("## Runtime input (AGENTS wrapper; attribution unverified)", markdown)
+            self.assertIn("## Incoming message (sender claim in text; unverified)", markdown)
+            self.assertIn("## User input (authorship unverified)", markdown)
+            self.assertIn('"timestamp": "2026-09-05T15:02:00Z"', markdown)
+            self.assertIn('"timestamp": null', markdown)
+            self.assertIn('"sourceLine": 2', markdown)
+            self.assertIn('"eventId": "turn-1"', markdown)
+            self.assertIn(hashlib.sha256(raw).hexdigest(), markdown)
+            self.assertNotIn("## User\n", markdown)
+
+    def test_provenance_preserves_physical_line_after_malformed_record(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "claude.jsonl"
+            path.write_text('not json\n' + json.dumps({"type": "user", "uuid": "original-id",
+                "timestamp": "2026-09-05T18:00:00Z", "message": {"role": "user", "content": "Hello"}}))
+            _, markdown = MODULE.render_session(path)
+            self.assertIn('"sourceLine": 2', markdown)
+            self.assertIn('"eventId": "original-id"', markdown)
+
     def test_claude_keeps_dialogue_and_strips_host_and_tools(self):
         rendered = MODULE.render_session(ROOT / "tests/fixtures/claude-session.jsonl")
         self.assertIsNotNone(rendered)

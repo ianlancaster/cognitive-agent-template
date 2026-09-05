@@ -289,11 +289,12 @@ After drafting, present the file to the user for review before committing. Incor
 
 ### Seed `context/current-state.md`
 
-Write an initial state document reflecting:
+Read `knowledge/current-state-contract.md`. Write an initial state document reflecting:
 - Stage: newly initialized
 - Domain focus areas from the user's answers
 - Initial priorities
 - Next actions (first real session topics)
+- The commissioned outcome, source of delegated authority and explicit prohibitions; distinguish the user's directions from your interpretations and inherited evidence. Do not activate work merely because an imported handoff proposes it.
 
 ### Seed `context/active-priorities.md`
 

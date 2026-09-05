@@ -1,6 +1,6 @@
 Pull template infrastructure updates without running the full `/sleep` ritual. Use this when you want the latest template changes ad hoc — new ritual commands, updated knowledge docs, script fixes — without the overhead of a full consolidation cycle.
 
-This is the same template-sync logic that runs as Phase 1 of `/sleep`, extracted for standalone use.
+This is the same template-sync logic that runs as Phase 1 of `/deep-sleep`, extracted for standalone use.
 
 ## Skip conditions
 
@@ -24,32 +24,22 @@ If the network call fails, report the error and stop.
 
 **A matching pointer means only that some past sync claimed success. It does not mean the files match.** This audit exists because that exact failure occurred: on 2026-07-28 `lastSyncedCommit` was advanced to template HEAD while four in-scope files were never updated and one command (`deep-sleep.md`) never arrived at all. Because the pointer sat at HEAD, `git diff <lastSyncedCommit> HEAD` was empty forever after and the mechanism could no longer detect its own gap. **Pointer-equality is self-concealing; only content comparison finds this.**
 
-Clone the template and compare **structure, not just existence**, for every in-scope file:
+Compare full content and the declared path set, not headings. Use the procedure below even when the pointer matches. A body-only change, an upstream-only addition, or a removed upstream file retained locally must remain visible.
 
-```bash
-for f in .claude/commands/*.md COGNITIVE.md; do
-  echo "--- $f"; diff <(grep '^#' "$f") <(grep '^#' "$TEMPLATE/$f")
-done
-```
+## Fetch and audit
 
-Report any in-scope template file you do not have, and any heading present in the template and absent in yours. **A heading-level difference is a finding even when the pointer matches** — reconcile it as a normal sync, then record it. Only after the audit comes back clean may you report "Template is up to date."
-
-## Fetch and diff
-
-1. Clone the template into a temp directory:
+1. Create one owned temporary directory and clone the configured template there. Keep its exact path; do not select or delete wildcard-matched sibling directories.
    ```bash
-   git clone --depth=50 <templateRemote> /tmp/cognitive-template-sync-$(date +%s)
+   TEMPLATE_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cognitive-template-sync.XXXXXX")"
+   git clone -- <templateRemote> "$TEMPLATE_DIR"
    ```
-   If `lastSyncedCommit` is not in the shallow history, retry without `--depth`.
-
-2. Inside the cloned repo, generate the diff and commit log:
+   Select the configured template ref if one is recorded. Verify the target commit and ensure `lastSyncedCommit` is available before auditing. A missing base is an error to resolve, not permission to omit removed paths.
+2. Read the commit log and diff between `lastSyncedCommit` and the selected target. Then run the full-content audit from the instance repository:
    ```bash
-   cd /tmp/cognitive-template-sync-*
-   git diff <lastSyncedCommit> HEAD
-   git log --oneline <lastSyncedCommit>..HEAD
+   python3 scripts/audit_template.py --local . --template "$TEMPLATE_DIR" --base <lastSyncedCommit>
    ```
-
-3. Read the diff output and commit messages to understand what changed and why.
+   If the instance predates the audit script, inspect and use the script from the selected template checkout first. The script is read-only. It covers the union of old and target upstream infrastructure paths, compares bytes and file modes against local files, and emits per-file identities. Exit 1 means unresolved differences, not a clean sync. Local-only instance files outside that upstream path union remain instance-owned.
+3. If a prior audit with intentional divergences exists, supply its path with `--dispositions <audit-json>`. A disposition counts only when its reason, target commit, upstream identity and local identity still match. An old reason cannot silently excuse changed bytes.
 
 ## Reconcile changes
 
@@ -62,6 +52,7 @@ For each changed file in the diff, read the template's new version from the temp
 - `AGENTS.md` — Codex bootstrap bridge
 - `COGNITIVE.md` — cognitive architecture spec
 - `scripts/*` — infrastructure scripts
+- `tests/**` — infrastructure regression tests and fixtures
 - `knowledge/*.md` — knowledge docs (ritual-cadence, conductor-protocol, etc.)
 - `CLAUDE.md` — structural sections only (see below)
 
@@ -90,23 +81,19 @@ For each changed file in the diff, read the template's new version from the temp
 
 **Reconciliation here is model judgment, and model judgment silently skips files.** So no file may be recorded as synced until its result is checked at the artifact:
 
-For every in-scope file the diff touched, re-read **your own file after editing** and confirm each heading and each substantive block the template added is now present. Compare headings mechanically:
-
-```bash
-diff <(grep '^#' <yourfile>) <(grep '^#' <templatefile>)
-```
+For each difference, read the whole changed content and reconcile it under the rules above. Run the full-content audit again after editing. Matching bytes/modes are mechanically `matched`; semantic integration into a customized file is model judgment and must be recorded as intentional divergence, not byte equality. In particular, `CLAUDE.md` normally retains local identity and therefore needs a source-bound disposition after its structural changes are checked.
 
 Classify every touched file as exactly one of:
 
-- **applied** — template content verified present in your file.
-- **diverged-intentionally** — you are deliberately not taking it (e.g. a retired subsystem). **Requires a one-line reason recorded in `.template-sync.json`.** Silent divergence is indistinguishable from a bug.
+- **applied** — full content and mode match (`matched` in the audit).
+- **diverged-intentionally** — you are deliberately not taking it (e.g. a retired subsystem). **Requires a reason in the audit record, bound to the target commit and both upstream/local identities.** Silent divergence is indistinguishable from a bug.
 - **skipped** — not applied and not justified. **This is a failure, not an outcome.** Report it in the summary.
 
 **"I read the diff and judged my version fine" is not `applied`, it is `diverged-intentionally`, and it needs the reason written down.** That conflation is what produced the 2026-07-28 failure.
 
 ## Finalize
 
-**Advance `lastSyncedCommit` to the new hash only if every touched in-scope file verified as `applied` or `diverged-intentionally`.** If any file is `skipped`, leave `lastSyncedCommit` where it is and list the skipped files under a `deferred` key — the pointer must never claim more than the content delivers.
+**Advance `lastSyncedCommit` only after the full-content audit reports `complete: true`.** Save its JSON under `context/template-sync-audit.json`; intentional divergence entries must first carry the reason and exact identities returned by the audit, then be passed back with `--dispositions` for verification. This proves the declared content relationship, not semantic correctness. Do not auto-generate reasons. If any file is `skipped`, leave `lastSyncedCommit` where it is and list the skipped files under a `deferred` key — the pointer must never claim more than the content delivers.
 
 Write `.template-sync.json` as:
 
@@ -116,6 +103,7 @@ Write `.template-sync.json` as:
   "lastSyncedCommit": "<advance only if nothing was skipped>",
   "lastSyncDate": "<today>",
   "lastAuditDate": "<today — set whenever the content audit ran>",
+  "contentAudit": "context/template-sync-audit.json",
   "deferred": [{ "file": "...", "sinceCommit": "...", "status": "skipped|diverged-intentionally", "reason": "..." }]
 }
 ```
@@ -124,7 +112,7 @@ Write `.template-sync.json` as:
 
 Clean up:
 ```bash
-rm -rf /tmp/cognitive-template-sync-*
+rm -rf -- "$TEMPLATE_DIR"
 ```
 
 ## Report
